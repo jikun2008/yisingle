@@ -109,6 +109,12 @@ public class UserServiceImpl implements UserService {
         return list;
     }
 
+    public List<UserEntity> findByPhoneNum(String phoneNum) {
+        List<UserEntity> list = userDao.findUserByPhoneNum(phoneNum);
+
+        return list;
+    }
+
     private UserEntity getOneUserEntityByName(String name) {
         List<UserEntity> list = getUserEntity(name);
         UserEntity entity;

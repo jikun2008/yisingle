@@ -10,4 +10,7 @@ public interface UserDao {
     List<UserEntity> findAll();
 
     List<UserEntity> findUserByName(String name);
+
+
+    List<UserEntity> findUserByPhoneNum(String phone);
 }

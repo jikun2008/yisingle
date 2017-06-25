@@ -64,5 +64,9 @@
     <orderEntry type="library" name="Maven: org.jboss:jandex:1.1.0.Final" level="project" />
     <orderEntry type="library" name="Maven: c3p0:c3p0:0.9.1.2" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.31" level="project" />
+    <orderEntry type="library" name="Maven: io.reactivex:rxjava:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.retrofit2:retrofit:2.3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.8.0" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.13.0" level="project" />
   </component>
 </module>

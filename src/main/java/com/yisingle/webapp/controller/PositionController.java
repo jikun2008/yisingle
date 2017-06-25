@@ -41,4 +41,23 @@ public class PositionController extends BaseController {
         return data;
 
     }
+
+    /**
+     * 返回车辆位置
+     *
+     * @return
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/getNearByCarPosition")
+    @ResponseBody
+    public ResponseData getNearByCarPosition(@Valid @RequestBody PositionRequestData requestData, BindingResult bindingResult) {
+        ResponseData data = new ResponseData();
+
+        if (bindingResult.hasErrors()) {
+            data.setErrorMsg(BindingResultUtils.getError(bindingResult));
+        } else {
+            data = positionService.nearByCar(requestData.getLatitude(),requestData.getLongitude());
+        }
+        return data;
+
+    }
 }

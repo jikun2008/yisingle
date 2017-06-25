@@ -1,9 +1,11 @@
 package com.yisingle.webapp.entity;
 
+import com.yisingle.webapp.data.OrderRequestData;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.lang.annotation.*;
 
 /**
  * Created by jikun on 17/5/2.
@@ -16,14 +18,48 @@ public class OrderEntity implements Serializable {
     private int id;
 
 
-    @NotEmpty
-    private String latitude;//纬度
-    @NotEmpty
-    private String longitude;//经度
-    @NotEmpty
-    private String ordername;
-    @NotEmpty
-    private String destination;//订单目的地名称
+    @NotEmpty(message = "phoneNum不能为空")
+    private String phoneNum;
+
+    @NotEmpty(message = "起点纬度不能空")
+    private String startLatitude;
+
+
+    @NotEmpty(message = "起点经度不能空")
+    private String startLongitude;
+
+
+    @NotEmpty(message = "终点纬度不能空")
+    private String endLatitude;
+
+    @NotEmpty(message = "终点经度不能空")
+    private String endLongitude;
+
+
+    @NotEmpty(message = "起点名称不能为空")
+    private String startPlaceName;
+
+
+    @NotEmpty(message = "终点名称不能为空")
+    private String endPlaceName;
+
+    public String getStartPlaceName() {
+        return startPlaceName;
+    }
+
+    public void setStartPlaceName(String startPlaceName) {
+        this.startPlaceName = startPlaceName;
+    }
+
+    public String getEndPlaceName() {
+        return endPlaceName;
+    }
+
+    public void setEndPlaceName(String endPlaceName) {
+        this.endPlaceName = endPlaceName;
+    }
+
+    private int orderState;
 
 
     @ManyToOne
@@ -38,36 +74,53 @@ public class OrderEntity implements Serializable {
         this.id = id;
     }
 
-    public String getLatitude() {
-        return latitude;
+
+    public String getPhoneNum() {
+        return phoneNum;
     }
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
+    public void setPhoneNum(String phoneNum) {
+        this.phoneNum = phoneNum;
     }
 
-    public String getLongitude() {
-        return longitude;
+    public String getStartLatitude() {
+        return startLatitude;
     }
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
+    public void setStartLatitude(String startLatitude) {
+        this.startLatitude = startLatitude;
     }
 
-    public String getOrdername() {
-        return ordername;
+    public String getStartLongitude() {
+        return startLongitude;
     }
 
-    public void setOrdername(String ordername) {
-        this.ordername = ordername;
+    public void setStartLongitude(String startLongitude) {
+        this.startLongitude = startLongitude;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getEndLatitude() {
+        return endLatitude;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setEndLatitude(String endLatitude) {
+        this.endLatitude = endLatitude;
+    }
+
+    public String getEndLongitude() {
+        return endLongitude;
+    }
+
+    public void setEndLongitude(String endLongitude) {
+        this.endLongitude = endLongitude;
+    }
+
+    public int getOrderState() {
+        return orderState;
+    }
+
+    public void setOrderState(int orderState) {
+        this.orderState = orderState;
     }
 
     public UserEntity getUserEntity() {
@@ -76,5 +129,41 @@ public class OrderEntity implements Serializable {
 
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
+    }
+
+    /**
+     * 订单状态注解
+     *
+     * @author peida
+     */
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface OrderState {
+
+        enum State {
+
+
+            WATI(0), HAVE_TAKE(1);
+            int state;
+
+            State(int state) {
+                this.state = state;
+            }
+
+            public int getState() {
+                return state;
+            }
+
+            public void setState(int state) {
+                this.state = state;
+            }
+
+            public int value() {
+                return state;
+            }
+        }
+
+
     }
 }

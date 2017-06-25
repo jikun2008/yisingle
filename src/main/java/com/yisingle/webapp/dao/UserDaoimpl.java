@@ -34,4 +34,13 @@ public class UserDaoimpl implements UserDao {
         return list;
 
     }
+
+    public List<UserEntity> findUserByPhoneNum(String phone) {
+        Session session = sessionFactory.getCurrentSession();
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_user WHERE phonenum=?").addEntity(UserEntity.class);
+
+        sqlQuery.setParameter(0, phone);
+        List<UserEntity> list = sqlQuery.list();
+        return list;
+    }
 }

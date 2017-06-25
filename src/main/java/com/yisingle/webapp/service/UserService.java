@@ -16,4 +16,6 @@ public interface UserService {
     List<UserEntity> getUserEntity(String name);
 
     ResponseData login(LoginRequestData data);
+
+    List<UserEntity> findByPhoneNum(String phoneNum);
 }
