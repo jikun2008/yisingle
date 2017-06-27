@@ -9,10 +9,17 @@ import java.io.Serializable;
 @Entity
 @Table(name = "t_position")
 public class PositionEntity implements Serializable {
-
     @Id
-    @GeneratedValue
+    @GeneratedValue()
     private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @Column(nullable = false)
     private String latitude;//纬度

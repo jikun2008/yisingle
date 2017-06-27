@@ -15,9 +15,16 @@ import java.util.Set;
 @Table(name = "t_user")
 public class UserEntity implements Serializable {
     @Id
-    @GeneratedValue
+    @GeneratedValue()
     private int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @NotEmpty(message = "username不能为空")
     private String username;
@@ -43,14 +50,6 @@ public class UserEntity implements Serializable {
     @JoinColumn(name = "userid")
     private Set<OrderEntity> setOrderEntity;
 
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;

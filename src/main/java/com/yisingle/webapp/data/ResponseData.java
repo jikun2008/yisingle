@@ -49,7 +49,7 @@ public class ResponseData<T> implements Serializable {
 
     public enum Code {
         // 利用构造函数传参
-        SUCCESS(0), FAILED(101);
+        SUCCESS(0), FAILED(101),HAVE(102);
 
         // 定义私有变量
         private int retcode;

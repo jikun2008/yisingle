@@ -2,11 +2,9 @@ package com.yisingle.webapp.controller;
 
 import com.yisingle.webapp.base.BaseController;
 import com.yisingle.webapp.data.OrderRequestData;
-import com.yisingle.webapp.data.PositionRequestData;
 import com.yisingle.webapp.data.ResponseData;
 import com.yisingle.webapp.entity.UserEntity;
 import com.yisingle.webapp.service.OrderService;
-import com.yisingle.webapp.service.PositionService;
 import com.yisingle.webapp.service.UserService;
 import com.yisingle.webapp.utils.BindingResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;

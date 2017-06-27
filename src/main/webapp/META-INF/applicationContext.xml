@@ -14,4 +14,5 @@
     <!-- 扫描文件（自动将servicec层注入） -->
     <context:component-scan base-package="com.yisingle.webapp.dao"/>
 
+
 </beans>

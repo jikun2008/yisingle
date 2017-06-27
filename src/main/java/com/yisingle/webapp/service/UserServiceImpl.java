@@ -39,9 +39,9 @@ public class UserServiceImpl implements UserService {
         String errormsg;
 
 
-        if (isUserExist(data.getUsername())) {
+        if (isUserExist(data.getPhonenum())) {
             code = ResponseData.Code.FAILED.value();
-            errormsg = "用户名已存在";
+            errormsg = "号码已注册";
         } else {
             UserEntity entity = new UserEntity();
             entity.setUsername(data.getUsername());
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         int code;
 
 
-        UserEntity userEntity = getOneUserEntityByName(data.getUsername());
+        UserEntity userEntity = getOneUserEntityByPhone(data.getUsername());
 
         if (null != userEntity) {
             if (userEntity.getPassword().equals(data.getPassword())) {
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
         } else {
             code = ResponseData.Code.FAILED.value();
-            errormsg = "用户不存在";
+            errormsg = "号码不存在";
         }
 
         responseData.setCode(code);
@@ -92,9 +92,9 @@ public class UserServiceImpl implements UserService {
     /**
      * 用户是否存在
      */
-    private boolean isUserExist(String name) {
+    private boolean isUserExist(String phone) {
         boolean isExist = false;
-        List<UserEntity> list = userDao.findUserByName(name);
+        List<UserEntity> list = userDao.findUserByPhoneNum(phone);
         isExist = null != list && !list.isEmpty();
         return isExist;
     }
@@ -115,8 +115,8 @@ public class UserServiceImpl implements UserService {
         return list;
     }
 
-    private UserEntity getOneUserEntityByName(String name) {
-        List<UserEntity> list = getUserEntity(name);
+    private UserEntity getOneUserEntityByPhone(String phoneNum) {
+        List<UserEntity> list = findByPhoneNum(phoneNum);
         UserEntity entity;
         if (null != list && !list.isEmpty()) {
             entity = list.get(0);

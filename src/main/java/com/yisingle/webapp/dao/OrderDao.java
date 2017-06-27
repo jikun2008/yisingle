@@ -18,4 +18,12 @@ public interface OrderDao {
     void delete(OrderEntity entity);
 
     List<OrderEntity> findAll();
+
+    OrderEntity load(int id);
+
+    OrderEntity find(int id);
+
+    List<OrderEntity> findWaitState();
+
+    List<OrderEntity> findWaitStateAndUserId(int state, int userid);
 }

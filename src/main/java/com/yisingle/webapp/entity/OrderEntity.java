@@ -1,7 +1,7 @@
 package com.yisingle.webapp.entity;
 
-import com.yisingle.webapp.data.OrderRequestData;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,11 +12,20 @@ import java.lang.annotation.*;
  */
 @Entity
 @Table(name = "t_order")
-public class OrderEntity implements Serializable {
+public class OrderEntity implements Serializable,Cloneable {
+
+
     @Id
     @GeneratedValue()
     private int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     @NotEmpty(message = "phoneNum不能为空")
     private String phoneNum;
@@ -43,6 +52,21 @@ public class OrderEntity implements Serializable {
     @NotEmpty(message = "终点名称不能为空")
     private String endPlaceName;
 
+
+    private int orderState;
+
+
+    @Lazy
+    @ManyToOne
+    @JoinColumn(name = "userid")
+    private UserEntity userEntity;
+
+    @Lazy
+    @ManyToOne
+    @JoinColumn(name = "driverid")
+    private DriverEntity driverEntity;
+
+
     public String getStartPlaceName() {
         return startPlaceName;
     }
@@ -58,22 +82,6 @@ public class OrderEntity implements Serializable {
     public void setEndPlaceName(String endPlaceName) {
         this.endPlaceName = endPlaceName;
     }
-
-    private int orderState;
-
-
-    @ManyToOne
-    @JoinColumn(name = "userid")
-    private UserEntity userEntity;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
 
     public String getPhoneNum() {
         return phoneNum;
@@ -131,6 +139,15 @@ public class OrderEntity implements Serializable {
         this.userEntity = userEntity;
     }
 
+
+    public DriverEntity getDriverEntity() {
+        return driverEntity;
+    }
+
+    public void setDriverEntity(DriverEntity driverEntity) {
+        this.driverEntity = driverEntity;
+    }
+
     /**
      * 订单状态注解
      *
@@ -144,7 +161,7 @@ public class OrderEntity implements Serializable {
         enum State {
 
 
-            WATI(0), HAVE_TAKE(1);
+            WATI(0), HAVE_TAKE(1), HAVE_COMPLETE(3);
             int state;
 
             State(int state) {
@@ -165,5 +182,17 @@ public class OrderEntity implements Serializable {
         }
 
 
+    }
+
+    @Override
+    public Object clone() {
+        OrderEntity orderEntity = null;
+
+        try {
+            orderEntity = (OrderEntity) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return orderEntity;
     }
 }

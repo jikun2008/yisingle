@@ -13,4 +13,9 @@ public interface OrderService {
     ResponseData generateWaitOrder(OrderRequestData requestData, UserEntity userEntity);
 
 
+    void changeOrderState();
+
+
+    ResponseData checkOrderState();
+
 }
