@@ -55,19 +55,19 @@ public class OrderDaoImpl implements OrderDao {
 
     public List<OrderEntity> findWaitState() {
         Session session = sessionFactory.getCurrentSession();
-        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState=?").addEntity(OrderEntity.class);
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList)").addEntity(OrderEntity.class);
 
-        sqlQuery.setParameter(0, OrderEntity.OrderState.State.WATI.value());
+        sqlQuery.setParameterList("valueList", new Integer[]{OrderEntity.OrderState.State.WATI_NEW.value(), OrderEntity.OrderState.State.WATI_OLD.value()});
         List<OrderEntity> list = sqlQuery.list();
         return list;
     }
 
-    public List<OrderEntity> findWaitStateAndUserId(int state, int userid) {
+    public List<OrderEntity> findWaitStateAndUserId(Integer[] state, int userid) {
         Session session = sessionFactory.getCurrentSession();
-        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState=? AND userid=?").addEntity(OrderEntity.class);
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList) AND userid= (:valueId)").addEntity(OrderEntity.class);
 
-        sqlQuery.setParameter(0, state);
-        sqlQuery.setParameter(1, userid);
+        sqlQuery.setParameterList("valueList", state);
+        sqlQuery.setParameter("valueId", userid);
         List<OrderEntity> list = sqlQuery.list();
         return list;
 

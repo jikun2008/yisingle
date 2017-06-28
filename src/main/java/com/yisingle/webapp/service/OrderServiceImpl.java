@@ -42,20 +42,25 @@ public class OrderServiceImpl implements OrderService {
     private DriverDao driverDao;
 
 
-    public ResponseData generateWaitOrder(OrderRequestData requestData, UserEntity userEntity) {
+    public ResponseData<OrderEntity> generateWaitOrder(OrderRequestData requestData, UserEntity userEntity) {
 
         ResponseData responseData = new ResponseData();
 
 
-        List<OrderEntity> list = orderDao.findWaitStateAndUserId(State.HAVE_TAKE.value(), userEntity.getId());
+        List<OrderEntity> list = orderDao.findWaitStateAndUserId(new Integer[]{State.WATI_NEW.value(), State.WATI_OLD.value(), State.HAVE_TAKE.value()}, userEntity.getId());
 
         if (null != list && list.size() > 0) {
 
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-            requestData.setId(list.get(0).getId());
-            requestData.setState(OrderRequestData.State.OLDER.value());
-            responseData.setResponse(requestData);
+            OrderEntity orderEntity = list.get(0);
+
+            responseData.setResponse(orderEntity);
             responseData.setErrorMsg("你有未完成的订单请先完成该订单");
+
+            if (orderEntity.getOrderState() == State.WATI_NEW.value()) {
+                orderEntity.setOrderState(State.WATI_OLD.value());
+            }
+            orderDao.save(orderEntity);
 
 
         } else {
@@ -67,15 +72,12 @@ public class OrderServiceImpl implements OrderService {
             entity.setStartLatitude(requestData.getStartLatitude());
             entity.setEndLongitude(requestData.getEndLongitude());
             entity.setEndLatitude(requestData.getEndLatitude());
-            entity.setOrderState(OrderEntity.OrderState.State.WATI.value());
+            entity.setOrderState(OrderEntity.OrderState.State.WATI_NEW.value());
             entity.setUserEntity(userEntity);
 
             orderDao.save(entity);
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-
-            requestData.setState(OrderRequestData.State.NEW.value());
-            requestData.setId(entity.getId());
-            responseData.setResponse(requestData);
+            responseData.setResponse(entity);
             responseData.setErrorMsg("");
 
 

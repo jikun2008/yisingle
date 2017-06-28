@@ -3,6 +3,7 @@ package com.yisingle.webapp.controller;
 import com.yisingle.webapp.base.BaseController;
 import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
+import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.entity.UserEntity;
 import com.yisingle.webapp.service.OrderService;
 import com.yisingle.webapp.service.UserService;
@@ -42,7 +43,7 @@ public class OrderController extends BaseController {
     @ResponseBody
     public ResponseData sendOrder(@Valid @RequestBody OrderRequestData requestData, BindingResult bindingResult) {
 
-        ResponseData data = new ResponseData();
+        ResponseData<OrderEntity> data = new ResponseData();
 
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));
@@ -58,10 +59,21 @@ public class OrderController extends BaseController {
             } else {
                 UserEntity userEntity = userEntityList.get(0);
                 data = orderService.generateWaitOrder(requestData, userEntity);
+
+                if (null != data.getResponse().getUserEntity()) {
+                    data.getResponse().getUserEntity().setSetOrderEntity(null);
+                }
+
+                if (null != data.getResponse().getDriverEntity()) {
+                    data.getResponse().getDriverEntity().setSetOrderEntity(null);
+                }
+
+
             }
 
 
         }
+
         return data;
     }
 }

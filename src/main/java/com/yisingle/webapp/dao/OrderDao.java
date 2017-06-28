@@ -25,5 +25,5 @@ public interface OrderDao {
 
     List<OrderEntity> findWaitState();
 
-    List<OrderEntity> findWaitStateAndUserId(int state, int userid);
+    List<OrderEntity> findWaitStateAndUserId(Integer[] state, int userid);
 }

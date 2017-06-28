@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  */
 @Entity
 @Table(name = "t_order")
-public class OrderEntity implements Serializable,Cloneable {
+public class OrderEntity implements Serializable, Cloneable {
 
 
     @Id
@@ -161,7 +161,7 @@ public class OrderEntity implements Serializable,Cloneable {
         enum State {
 
 
-            WATI(0), HAVE_TAKE(1), HAVE_COMPLETE(3);
+            WATI_NEW(-1),WATI_OLD(0), HAVE_TAKE(1), HAVE_COMPLETE(2);
             int state;
 
             State(int state) {

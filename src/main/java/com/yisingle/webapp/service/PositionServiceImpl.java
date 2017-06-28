@@ -63,8 +63,7 @@ public class PositionServiceImpl implements PositionService {
 
             double random = Math.random() - 0.5;
             double random1 = Math.random() - 0.5;
-            System.out.print("测试代码:" + random);
-            System.out.print("测试代码:" + random1);
+
             double nowlatitude = formatDouble2(currentlatitude + random * 0.01, 6);
             double nowlongitude = formatDouble2((currentlongitude + random1 * 0.01), 6);
 

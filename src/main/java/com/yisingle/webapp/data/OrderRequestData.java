@@ -11,9 +11,6 @@ import java.lang.annotation.*;
 public class OrderRequestData implements Serializable {
 
 
-    private int state;
-    private int id;
-
     @NotEmpty(message = "phoneNum不能为空")
     private String phoneNum;
 
@@ -96,36 +93,5 @@ public class OrderRequestData implements Serializable {
         this.endPlaceName = endPlaceName;
     }
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public enum State {
-        // 利用构造函数传参
-        NEW(66), OLDER(67);
-
-        // 定义私有变量
-        private int code;
-
-        State(int code) {
-            this.code = code;
-        }
-
-        public int value() {
-            return code;
-        }
-    }
 }
