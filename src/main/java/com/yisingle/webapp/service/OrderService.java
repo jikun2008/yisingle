@@ -2,6 +2,7 @@ package com.yisingle.webapp.service;
 
 import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
+import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.entity.UserEntity;
 
 /**
@@ -13,9 +14,17 @@ public interface OrderService {
     ResponseData generateWaitOrder(OrderRequestData requestData, UserEntity userEntity);
 
 
-    void changeOrderState();
+    void changeOrderWaitNewStateToWatiOldState();
 
 
-    ResponseData checkOrderState();
+    ResponseData<OrderEntity> changOrderState(int orderId, int orderState);
+
+
+    ResponseData<OrderEntity> acceptDriverOrder(int orderId);
+
+    ResponseData<OrderEntity>  finishDriverOrder(int orderId);
+
+
+    ResponseData<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId);
 
 }

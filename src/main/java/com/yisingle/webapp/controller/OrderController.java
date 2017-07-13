@@ -48,8 +48,6 @@ public class OrderController extends BaseController {
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));
         } else {
-
-
             List<UserEntity> userEntityList = userService.findByPhoneNum(requestData.getPhoneNum());
 
             if (null != userEntityList && userEntityList.size() == 0) {
@@ -60,18 +58,7 @@ public class OrderController extends BaseController {
                 UserEntity userEntity = userEntityList.get(0);
                 data = orderService.generateWaitOrder(requestData, userEntity);
 
-                if (null != data.getResponse().getUserEntity()) {
-                    data.getResponse().getUserEntity().setSetOrderEntity(null);
-                }
-
-                if (null != data.getResponse().getDriverEntity()) {
-                    data.getResponse().getDriverEntity().setSetOrderEntity(null);
-                }
-
-
             }
-
-
         }
 
         return data;

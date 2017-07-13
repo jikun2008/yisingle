@@ -1,5 +1,7 @@
 package com.yisingle.webapp.entity;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.hibernate.annotations.Fetch;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Lazy;
 
@@ -56,13 +58,14 @@ public class OrderEntity implements Serializable, Cloneable {
     private int orderState;
 
 
-    @Lazy
-    @ManyToOne
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid")
     private UserEntity userEntity;
 
-    @Lazy
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driverid")
     private DriverEntity driverEntity;
 
@@ -161,7 +164,14 @@ public class OrderEntity implements Serializable, Cloneable {
         enum State {
 
 
-            WATI_NEW(-1),WATI_OLD(0), HAVE_TAKE(1), HAVE_COMPLETE(2);
+
+            WATI_NEW(-1),
+            WATI_OLD(0),
+            HAVE_TAKE(1),//订单已接受
+            DRIVER_ARRIVE(2),//司机已到达
+            PASSENGER_IN_CAR(3),//乘客已经上车
+            PASSENGER_OUT_CAR(4),//乘客已下车
+            HAVE_COMPLETE(5);//订单已经完成
             int state;
 
             State(int state) {

@@ -3,6 +3,7 @@ package com.yisingle.webapp.service;
 import com.yisingle.webapp.dao.DriverDao;
 import com.yisingle.webapp.data.DriverLoginRequestData;
 import com.yisingle.webapp.data.DriverRegisterRequestData;
+import com.yisingle.webapp.data.DriverStateRequestData;
 import com.yisingle.webapp.data.ResponseData;
 import com.yisingle.webapp.entity.DriverEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class DriverServiceImpl implements DriverService {
         return data;
     }
 
-    public ResponseData loginDriver(DriverLoginRequestData loginRequestData) {
+    public ResponseData<DriverEntity> loginDriver(DriverLoginRequestData loginRequestData) {
         ResponseData data = new ResponseData();
 
         List<DriverEntity> driverEntityList = driverDao.findDriverByPhoneNum(loginRequestData.getPhonenum());
@@ -63,6 +64,34 @@ public class DriverServiceImpl implements DriverService {
                 data.setCode(ResponseData.Code.FAILED.value());
                 data.setErrorMsg("密码错误");
             }
+
+
+        } else {
+
+            data.setCode(ResponseData.Code.FAILED.value());
+            data.setErrorMsg("司机的账号不存在");
+
+        }
+        return data;
+    }
+
+    public ResponseData<DriverEntity> changeDriverState(DriverStateRequestData stateRequestData) {
+
+
+        ResponseData data = new ResponseData();
+
+        List<DriverEntity> driverEntityList = driverDao.findDriverByPhoneNum(stateRequestData.getPhonenum());
+
+        if (null != driverEntityList && driverEntityList.size() > 0) {
+
+            DriverEntity entity = driverEntityList.get(0);
+
+            entity.setState(stateRequestData.getState());
+
+            driverDao.save(entity);
+
+            data.setCode(ResponseData.Code.SUCCESS.value());
+            data.setResponse(entity);
 
 
         } else {

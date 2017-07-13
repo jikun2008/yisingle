@@ -1,14 +1,19 @@
 package com.yisingle.webapp.entity;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.lang.annotation.*;
+import java.lang.annotation.Target;
 import java.util.Set;
 
 import com.yisingle.webapp.entity.DriverEntity.DriverState.State;
+import org.hibernate.annotations.CascadeType;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * Created by jikun on 17/6/26.
@@ -47,7 +52,8 @@ public class DriverEntity implements Serializable {
 
     private int state = State.WATI_FOR_ORDER.value();//司机状态  等待中,服务中,下线中
 
-    @OneToMany
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY)
     @Cascade(value = {CascadeType.SAVE_UPDATE})
     @JoinColumn(name = "driverid")
     private Set<OrderEntity> setOrderEntity;

@@ -2,6 +2,7 @@ package com.yisingle.webapp.entity;
 
 
 import com.yisingle.webapp.utils.PredicateFormatString;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -45,6 +46,7 @@ public class UserEntity implements Serializable {
 
     private Long time;
 
+    @JsonIgnore
     @OneToMany
     @Cascade(value = {CascadeType.SAVE_UPDATE})
     @JoinColumn(name = "userid")

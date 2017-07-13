@@ -2,13 +2,11 @@ package com.yisingle.webapp.dao;
 
 import com.yisingle.webapp.entity.DriverEntity;
 
-import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -39,9 +37,9 @@ public class DriverDaoimpl implements DriverDao {
     public List<DriverEntity> findDriverByPhoneNum(String phone) {
         Session session = sessionFactory.getCurrentSession();
         SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_driver WHERE phonenum=?").addEntity(DriverEntity.class);
-
         sqlQuery.setParameter(0, phone);
         List<DriverEntity> list = sqlQuery.list();
+
         return list;
     }
 

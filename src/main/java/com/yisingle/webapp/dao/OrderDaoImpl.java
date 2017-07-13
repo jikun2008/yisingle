@@ -53,11 +53,11 @@ public class OrderDaoImpl implements OrderDao {
         return orderEntity;
     }
 
-    public List<OrderEntity> findWaitState() {
+    public List<OrderEntity> findWaitNewStateOrder() {
         Session session = sessionFactory.getCurrentSession();
         SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList)").addEntity(OrderEntity.class);
 
-        sqlQuery.setParameterList("valueList", new Integer[]{OrderEntity.OrderState.State.WATI_NEW.value(), OrderEntity.OrderState.State.WATI_OLD.value()});
+        sqlQuery.setParameterList("valueList", new Integer[]{OrderEntity.OrderState.State.WATI_NEW.value()});
         List<OrderEntity> list = sqlQuery.list();
         return list;
     }
@@ -71,5 +71,20 @@ public class OrderDaoImpl implements OrderDao {
         List<OrderEntity> list = sqlQuery.list();
         return list;
 
+    }
+
+    public List<OrderEntity> findOrderByDriverId(String driverId) {
+        List<OrderEntity> list = findOrderByDriverIdAndState(new Integer[]{OrderEntity.OrderState.State.WATI_NEW.value(), OrderEntity.OrderState.State.WATI_OLD.value()}, driverId);
+        return list;
+    }
+
+    public List<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId) {
+        Session session = sessionFactory.getCurrentSession();
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList) AND driverid= (:valueId)").addEntity(OrderEntity.class);
+
+        sqlQuery.setParameterList("valueList", states);
+        sqlQuery.setParameter("valueId", driverId);
+        List<OrderEntity> list = sqlQuery.list();
+        return list;
     }
 }

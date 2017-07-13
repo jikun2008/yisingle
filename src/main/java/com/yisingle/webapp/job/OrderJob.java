@@ -22,7 +22,7 @@ public class OrderJob implements Job {
 
 
         System.out.println("工作中");
-        orderService.changeOrderState();
+        orderService.changeOrderWaitNewStateToWatiOldState();
 
     }
 }

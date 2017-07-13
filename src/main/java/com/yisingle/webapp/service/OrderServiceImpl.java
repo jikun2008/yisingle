@@ -109,9 +109,9 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    public void changeOrderState() {
+    public void changeOrderWaitNewStateToWatiOldState() {
 
-        List<OrderEntity> orderEntityList = orderDao.findWaitState();
+        List<OrderEntity> orderEntityList = orderDao.findWaitNewStateOrder();
 
         if (null == orderEntityList) {
             return;
@@ -121,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
             OrderEntity orderEntity = orderEntityList.get(0);
             List<DriverEntity> driverEntityList = driverDao.findDriverByState(DriverEntity.DriverState.State.WATI_FOR_ORDER.value());
             if (null != driverEntityList && driverEntityList.size() > 0) {
-                orderEntity.setOrderState(State.HAVE_TAKE.value());
+                orderEntity.setOrderState(State.WATI_OLD.value());
                 orderEntity.setDriverEntity(driverEntityList.get(0));
             }
             orderDao.update(orderEntity);
@@ -130,10 +130,86 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    public ResponseData checkOrderState() {
+    public ResponseData<OrderEntity> changOrderState(int orderId, int orderState) {
+        ResponseData<OrderEntity> responseData = new ResponseData();
+        OrderEntity orderEntity = orderDao.find(orderId);
+        if (orderEntity != null) {
+            orderEntity.setOrderState(orderState);
+            orderDao.save(orderEntity);
+            responseData.setCode(ResponseData.Code.SUCCESS.value());
+            responseData.setResponse(orderEntity);
+        } else {
+            responseData.setErrorMsg("未找到订单");
+        }
 
-        ResponseData responseData = new ResponseData();
-        return null;
+
+        return responseData;
+    }
+
+
+
+
+    public ResponseData<OrderEntity> acceptDriverOrder(int orderId) {
+        ResponseData<OrderEntity> responseData = new ResponseData();
+        OrderEntity orderEntity = orderDao.find(orderId);
+        if (orderEntity != null) {
+
+            orderEntity.setOrderState(State.HAVE_TAKE.value());
+
+
+            DriverEntity driverEntity = orderEntity.getDriverEntity();
+
+            driverEntity.setState(DriverEntity.DriverState.State.SERVICE.value());
+            orderDao.save(orderEntity);
+
+            driverDao.save(driverEntity);
+
+            responseData.setCode(ResponseData.Code.SUCCESS.value());
+            responseData.setResponse(orderEntity);
+        } else {
+            responseData.setCode(ResponseData.Code.FAILED.value());
+            responseData.setErrorMsg("未找到当前订单");
+        }
+        return responseData;
+    }
+
+    public ResponseData<OrderEntity> finishDriverOrder(int orderId) {
+        ResponseData<OrderEntity> responseData = new ResponseData();
+        OrderEntity orderEntity = orderDao.find(orderId);
+        if (orderEntity != null) {
+
+            orderEntity.setOrderState(State.HAVE_COMPLETE.value());
+
+
+            DriverEntity driverEntity = orderEntity.getDriverEntity();
+
+            driverEntity.setState(DriverEntity.DriverState.State.WATI_FOR_ORDER.value());
+            orderDao.save(orderEntity);
+
+            driverDao.save(driverEntity);
+
+            responseData.setCode(ResponseData.Code.SUCCESS.value());
+            responseData.setResponse(orderEntity);
+        } else {
+            responseData.setCode(ResponseData.Code.FAILED.value());
+            responseData.setErrorMsg("未找到当前订单");
+        }
+        return responseData;
+    }
+
+    public ResponseData<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId) {
+        ResponseData<OrderEntity> responseData = new ResponseData();
+        List<OrderEntity> orderEntityList = orderDao.findOrderByDriverIdAndState(states, driverId);
+        if (null != orderEntityList && orderEntityList.size() > 0) {
+            OrderEntity entity = orderEntityList.get(0);
+            responseData.setCode(ResponseData.Code.SUCCESS.value());
+            responseData.setResponse(entity);
+        } else {
+            responseData.setCode(ResponseData.Code.FAILED.value());
+            responseData.setErrorMsg("未找到订单");
+        }
+        return responseData;
+
     }
 
 

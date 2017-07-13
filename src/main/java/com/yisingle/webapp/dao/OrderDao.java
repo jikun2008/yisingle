@@ -23,7 +23,12 @@ public interface OrderDao {
 
     OrderEntity find(int id);
 
-    List<OrderEntity> findWaitState();
+    List<OrderEntity> findWaitNewStateOrder();
 
     List<OrderEntity> findWaitStateAndUserId(Integer[] state, int userid);
+
+    List<OrderEntity> findOrderByDriverId(String driverId);
+
+
+     List<OrderEntity> findOrderByDriverIdAndState(Integer[] states,String driverId);
 }

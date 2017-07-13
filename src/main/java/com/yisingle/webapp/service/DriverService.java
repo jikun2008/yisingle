@@ -2,7 +2,9 @@ package com.yisingle.webapp.service;
 
 import com.yisingle.webapp.data.DriverLoginRequestData;
 import com.yisingle.webapp.data.DriverRegisterRequestData;
+import com.yisingle.webapp.data.DriverStateRequestData;
 import com.yisingle.webapp.data.ResponseData;
+import com.yisingle.webapp.entity.DriverEntity;
 
 /**
  * Created by jikun on 17/6/26.
@@ -10,5 +12,7 @@ import com.yisingle.webapp.data.ResponseData;
 public interface DriverService {
     ResponseData saveDriver(DriverRegisterRequestData driverRequestData);
 
-    ResponseData loginDriver(DriverLoginRequestData loginRequestData);
+    ResponseData<DriverEntity> loginDriver(DriverLoginRequestData loginRequestData);
+
+    ResponseData<DriverEntity> changeDriverState(DriverStateRequestData stateRequestData);
 }
