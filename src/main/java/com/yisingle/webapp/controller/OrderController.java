@@ -1,6 +1,7 @@
 package com.yisingle.webapp.controller;
 
 import com.yisingle.webapp.base.BaseController;
+import com.yisingle.webapp.data.OrderDetailData;
 import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
 import com.yisingle.webapp.entity.OrderEntity;
@@ -43,7 +44,7 @@ public class OrderController extends BaseController {
     @ResponseBody
     public ResponseData sendOrder(@Valid @RequestBody OrderRequestData requestData, BindingResult bindingResult) {
 
-        ResponseData<OrderEntity> data = new ResponseData();
+        ResponseData<OrderDetailData> data = new ResponseData();
 
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));

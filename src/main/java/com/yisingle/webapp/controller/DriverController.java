@@ -34,7 +34,7 @@ public class DriverController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/driver/register")
     @ResponseBody
-    public ResponseData register(@Valid @RequestBody DriverRegisterRequestData requestData, BindingResult bindingResult) {
+    public ResponseData<DriverEntity> register(@Valid @RequestBody DriverRegisterRequestData requestData, BindingResult bindingResult) {
 
         ResponseData data = new ResponseData();
 
@@ -85,8 +85,8 @@ public class DriverController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/driver/findDriverOrder")
     @ResponseBody
-    public ResponseData<OrderEntity> findDriverOrder(@Valid @RequestBody DriverOrderRequest requestData, BindingResult bindingResult) {
-        ResponseData<OrderEntity> data = new ResponseData();
+    public ResponseData<OrderDetailData> findDriverOrder(@Valid @RequestBody DriverOrderRequest requestData, BindingResult bindingResult) {
+        ResponseData<OrderDetailData> data = new ResponseData();
 
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));
@@ -101,8 +101,8 @@ public class DriverController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/driver/acceptDriverOrder")
     @ResponseBody
-    public ResponseData<OrderEntity> acceptDriverOrder(@Valid @RequestBody DriverAccentOrderRequestData requestData, BindingResult bindingResult) {
-        ResponseData<OrderEntity> data = new ResponseData();
+    public ResponseData<OrderDetailData> acceptDriverOrder(@Valid @RequestBody DriverAccentOrderRequestData requestData, BindingResult bindingResult) {
+        ResponseData<OrderDetailData> data = new ResponseData();
 
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));
@@ -114,8 +114,8 @@ public class DriverController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/driver/finishDriverOrder")
     @ResponseBody
-    public ResponseData<OrderEntity> finishDriverOrder(@Valid @RequestBody DriverAccentOrderRequestData requestData, BindingResult bindingResult) {
-        ResponseData<OrderEntity> data = new ResponseData();
+    public ResponseData<OrderDetailData> finishDriverOrder(@Valid @RequestBody DriverAccentOrderRequestData requestData, BindingResult bindingResult) {
+        ResponseData<OrderDetailData> data = new ResponseData();
 
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));
@@ -128,8 +128,8 @@ public class DriverController extends BaseController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/driver/changeDriverOrderState")
     @ResponseBody
-    public ResponseData<OrderEntity> changeDriverOrderState(@Valid @RequestBody DriverchangeOrderRequest requestData, BindingResult bindingResult) {
-        ResponseData<OrderEntity> data = new ResponseData();
+    public ResponseData<OrderDetailData> changeDriverOrderState(@Valid @RequestBody DriverchangeOrderRequest requestData, BindingResult bindingResult) {
+        ResponseData<OrderDetailData> data = new ResponseData();
 
         if (bindingResult.hasErrors()) {
             data.setErrorMsg(BindingResultUtils.getError(bindingResult));

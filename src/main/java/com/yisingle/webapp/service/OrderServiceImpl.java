@@ -3,6 +3,8 @@ package com.yisingle.webapp.service;
 import com.sun.tools.corba.se.idl.constExpr.Or;
 import com.yisingle.webapp.dao.DriverDao;
 import com.yisingle.webapp.dao.OrderDao;
+import com.yisingle.webapp.dao.UserDao;
+import com.yisingle.webapp.data.OrderDetailData;
 import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
 import com.yisingle.webapp.entity.DriverEntity;
@@ -41,10 +43,13 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private DriverDao driverDao;
 
+    @Autowired
+    private UserDao userDao;
 
-    public ResponseData<OrderEntity> generateWaitOrder(OrderRequestData requestData, UserEntity userEntity) {
 
-        ResponseData responseData = new ResponseData();
+    public ResponseData<OrderDetailData> generateWaitOrder(OrderRequestData requestData, UserEntity userEntity) {
+
+        ResponseData<OrderDetailData> responseData = new ResponseData();
 
 
         List<OrderEntity> list = orderDao.findWaitStateAndUserId(new Integer[]{State.WATI_NEW.value(), State.WATI_OLD.value(), State.HAVE_TAKE.value()}, userEntity.getId());
@@ -54,13 +59,23 @@ public class OrderServiceImpl implements OrderService {
             responseData.setCode(ResponseData.Code.SUCCESS.value());
             OrderEntity orderEntity = list.get(0);
 
-            responseData.setResponse(orderEntity);
-            responseData.setErrorMsg("你有未完成的订单请先完成该订单");
 
             if (orderEntity.getOrderState() == State.WATI_NEW.value()) {
                 orderEntity.setOrderState(State.WATI_OLD.value());
             }
             orderDao.save(orderEntity);
+
+            DriverEntity driver = orderEntity.getDriverEntity();
+
+            UserEntity user = orderEntity.getUserEntity();
+
+            OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
+
+            orderDetailData.setDriver(driver);
+            orderDetailData.setUser(user);
+
+            responseData.setResponse(orderDetailData);
+            responseData.setErrorMsg("你有未完成的订单请先完成该订单");
 
 
         } else {
@@ -76,8 +91,11 @@ public class OrderServiceImpl implements OrderService {
             entity.setUserEntity(userEntity);
 
             orderDao.save(entity);
+
+            OrderDetailData orderDetailData = new OrderDetailData(entity);
+
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-            responseData.setResponse(entity);
+            responseData.setResponse(orderDetailData);
             responseData.setErrorMsg("");
 
 
@@ -130,14 +148,23 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    public ResponseData<OrderEntity> changOrderState(int orderId, int orderState) {
-        ResponseData<OrderEntity> responseData = new ResponseData();
+    public ResponseData<OrderDetailData> changOrderState(int orderId, int orderState) {
+        ResponseData<OrderDetailData> responseData = new ResponseData();
         OrderEntity orderEntity = orderDao.find(orderId);
         if (orderEntity != null) {
+
+
             orderEntity.setOrderState(orderState);
             orderDao.save(orderEntity);
+            UserEntity user = orderEntity.getUserEntity();
+            DriverEntity driver = orderEntity.getDriverEntity();
+
+            OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
+            orderDetailData.setUser(user);
+            orderDetailData.setDriver(driver);
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-            responseData.setResponse(orderEntity);
+
+            responseData.setResponse(orderDetailData);
         } else {
             responseData.setErrorMsg("未找到订单");
         }
@@ -147,10 +174,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-
-
-    public ResponseData<OrderEntity> acceptDriverOrder(int orderId) {
-        ResponseData<OrderEntity> responseData = new ResponseData();
+    public ResponseData<OrderDetailData> acceptDriverOrder(int orderId) {
+        ResponseData<OrderDetailData> responseData = new ResponseData();
         OrderEntity orderEntity = orderDao.find(orderId);
         if (orderEntity != null) {
 
@@ -164,8 +189,16 @@ public class OrderServiceImpl implements OrderService {
 
             driverDao.save(driverEntity);
 
+
+            UserEntity user = orderEntity.getUserEntity();
+
+
+            OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
+            orderDetailData.setUser(user);
+            orderDetailData.setDriver(driverEntity);
+
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-            responseData.setResponse(orderEntity);
+            responseData.setResponse(orderDetailData);
         } else {
             responseData.setCode(ResponseData.Code.FAILED.value());
             responseData.setErrorMsg("未找到当前订单");
@@ -173,8 +206,8 @@ public class OrderServiceImpl implements OrderService {
         return responseData;
     }
 
-    public ResponseData<OrderEntity> finishDriverOrder(int orderId) {
-        ResponseData<OrderEntity> responseData = new ResponseData();
+    public ResponseData<OrderDetailData> finishDriverOrder(int orderId) {
+        ResponseData<OrderDetailData> responseData = new ResponseData();
         OrderEntity orderEntity = orderDao.find(orderId);
         if (orderEntity != null) {
 
@@ -188,8 +221,15 @@ public class OrderServiceImpl implements OrderService {
 
             driverDao.save(driverEntity);
 
+            UserEntity user = orderEntity.getUserEntity();
+
+
+            OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
+            orderDetailData.setUser(user);
+            orderDetailData.setDriver(driverEntity);
+
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-            responseData.setResponse(orderEntity);
+            responseData.setResponse(orderDetailData);
         } else {
             responseData.setCode(ResponseData.Code.FAILED.value());
             responseData.setErrorMsg("未找到当前订单");
@@ -197,13 +237,23 @@ public class OrderServiceImpl implements OrderService {
         return responseData;
     }
 
-    public ResponseData<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId) {
-        ResponseData<OrderEntity> responseData = new ResponseData();
+    public ResponseData<OrderDetailData> findOrderByDriverIdAndState(Integer[] states, String driverId) {
+        ResponseData<OrderDetailData> responseData = new ResponseData();
         List<OrderEntity> orderEntityList = orderDao.findOrderByDriverIdAndState(states, driverId);
         if (null != orderEntityList && orderEntityList.size() > 0) {
-            OrderEntity entity = orderEntityList.get(0);
+            OrderEntity orderEntity = orderEntityList.get(0);
+
+
+            UserEntity user = orderEntity.getUserEntity();
+            DriverEntity driver = orderEntity.getDriverEntity();
+
+            OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
+            orderDetailData.setUser(user);
+            orderDetailData.setDriver(driver);
+
+
             responseData.setCode(ResponseData.Code.SUCCESS.value());
-            responseData.setResponse(entity);
+            responseData.setResponse(orderDetailData);
         } else {
             responseData.setCode(ResponseData.Code.FAILED.value());
             responseData.setErrorMsg("未找到订单");

@@ -60,12 +60,12 @@ public class OrderEntity implements Serializable, Cloneable {
 
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "userid")
     private UserEntity userEntity;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "driverid")
     private DriverEntity driverEntity;
 
