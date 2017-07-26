@@ -19,6 +19,12 @@ public class DriverDaoimpl implements DriverDao {
         return (Integer) sessionFactory.getCurrentSession().save(u);
     }
 
+    public DriverEntity findById(int id) {
+
+        DriverEntity driverEntity = (DriverEntity) sessionFactory.getCurrentSession().get(DriverEntity.class, id);
+        return driverEntity;
+    }
+
     public List<DriverEntity> findAll() {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(DriverEntity.class);
         return criteria.list();

@@ -39,6 +39,14 @@ public class OrderDetailData implements Serializable {
     private String endPlaceName;
 
 
+    //订单创建时间
+    private long createTime;
+
+
+    //司机端收到回复时间
+    private long driverRelyTime;
+
+
     private int orderState;
 
 
@@ -56,6 +64,8 @@ public class OrderDetailData implements Serializable {
         this.startPlaceName = entity.getStartPlaceName();
         this.endPlaceName = entity.getEndPlaceName();
         this.orderState = entity.getOrderState();
+        this.createTime = entity.getCreateTime();
+        this.driverRelyTime = entity.getDriverRelyTime();
     }
 
     public int getId() {
@@ -144,5 +154,22 @@ public class OrderDetailData implements Serializable {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
+
+    public long getDriverRelyTime() {
+        return driverRelyTime;
+    }
+
+    public void setDriverRelyTime(long driverRelyTime) {
+        this.driverRelyTime = driverRelyTime;
     }
 }

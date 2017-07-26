@@ -1,6 +1,7 @@
 package com.yisingle.webapp.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yisingle.webapp.utils.PredicateFormatString;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cascade;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Set;
-
+@JsonIgnoreProperties({ "setOrderEntity"})
 @Entity
 @Table(name = "t_user")
 public class UserEntity implements Serializable {

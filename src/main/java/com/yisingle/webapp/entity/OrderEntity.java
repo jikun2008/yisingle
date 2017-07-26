@@ -1,5 +1,6 @@
 package com.yisingle.webapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -12,6 +13,7 @@ import java.lang.annotation.*;
 /**
  * Created by jikun on 17/5/2.
  */
+@JsonIgnoreProperties({"userEntity", "driverEntity"})
 @Entity
 @Table(name = "t_order")
 public class OrderEntity implements Serializable, Cloneable {
@@ -57,6 +59,12 @@ public class OrderEntity implements Serializable, Cloneable {
 
     private int orderState;
 
+    //订单创建时间
+    private long createTime;
+
+
+    //司机端收到回复时间
+    private long driverRelyTime;
 
 
     @JsonIgnore
@@ -69,6 +77,22 @@ public class OrderEntity implements Serializable, Cloneable {
     @JoinColumn(name = "driverid")
     private DriverEntity driverEntity;
 
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
+
+    public long getDriverRelyTime() {
+        return driverRelyTime;
+    }
+
+    public void setDriverRelyTime(long driverRelyTime) {
+        this.driverRelyTime = driverRelyTime;
+    }
 
     public String getStartPlaceName() {
         return startPlaceName;
@@ -162,7 +186,6 @@ public class OrderEntity implements Serializable, Cloneable {
     public @interface OrderState {
 
         enum State {
-
 
 
             WATI_NEW(-1),

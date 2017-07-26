@@ -1,5 +1,6 @@
 package com.yisingle.webapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.*;
 
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Lazy;
 /**
  * Created by jikun on 17/6/26.
  */
+@JsonIgnoreProperties({ "setOrderEntity"})
 @Entity
 @Table(name = "t_driver")
 public class DriverEntity implements Serializable {
@@ -52,11 +54,15 @@ public class DriverEntity implements Serializable {
 
     private int state = State.WATI_FOR_ORDER.value();//司机状态  等待中,服务中,下线中
 
+
+    private long onlineTime = 0;
+
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
     @Cascade(value = {CascadeType.SAVE_UPDATE})
     @JoinColumn(name = "driverid")
     private Set<OrderEntity> setOrderEntity;
+
 
     public Set<OrderEntity> getSetOrderEntity() {
         return setOrderEntity;
@@ -121,6 +127,15 @@ public class DriverEntity implements Serializable {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+
+    public long getOnlineTime() {
+        return onlineTime;
+    }
+
+    public void setOnlineTime(long onlineTime) {
+        this.onlineTime = onlineTime;
     }
 
     /**

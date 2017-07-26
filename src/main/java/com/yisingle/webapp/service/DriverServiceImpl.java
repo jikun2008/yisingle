@@ -1,11 +1,12 @@
 package com.yisingle.webapp.service;
 
 import com.yisingle.webapp.dao.DriverDao;
-import com.yisingle.webapp.data.DriverLoginRequestData;
-import com.yisingle.webapp.data.DriverRegisterRequestData;
-import com.yisingle.webapp.data.DriverStateRequestData;
-import com.yisingle.webapp.data.ResponseData;
+import com.yisingle.webapp.dao.OrderDao;
+import com.yisingle.webapp.data.*;
 import com.yisingle.webapp.entity.DriverEntity;
+import com.yisingle.webapp.entity.OrderEntity;
+import com.yisingle.webapp.websocket.SystemWebSocketHandler;
+import org.apache.commons.logging.impl.SimpleLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +20,13 @@ import java.util.List;
 @Transactional
 public class DriverServiceImpl implements DriverService {
 
+    private SimpleLog simpleLog = new SimpleLog(DriverServiceImpl.class.getSimpleName());
+
     @Autowired
     private DriverDao driverDao;
+
+    @Autowired
+    private OrderDao orderDao;
 
     public ResponseData saveDriver(DriverRegisterRequestData driverRequestData) {
         ResponseData data = new ResponseData();
@@ -102,4 +108,25 @@ public class DriverServiceImpl implements DriverService {
         }
         return data;
     }
+
+    /**
+     * 保存坐标点到司机的数据表中
+     */
+    public void saveLocationPointToDriver(HeartBeatData data) {
+        if (null != data & !data.getLatitude().equals("") && !data.getLongitude().equals("")) {
+            DriverEntity driverEntity = driverDao.findById(data.getId());
+            if (null != driverEntity) {
+                driverEntity.setLatitude(data.getLatitude());
+                driverEntity.setLongitude(data.getLongitude());
+                driverEntity.setOnlineTime(System.currentTimeMillis());
+                driverDao.save(driverEntity);
+            } else {
+                simpleLog.info("未能查询当前司机不能保存坐标到数据库 ");
+            }
+        }
+
+
+    }
+
+
 }

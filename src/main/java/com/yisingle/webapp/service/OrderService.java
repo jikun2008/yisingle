@@ -15,7 +15,7 @@ public interface OrderService {
     ResponseData<OrderDetailData> generateWaitOrder(OrderRequestData requestData, UserEntity userEntity);
 
 
-    void changeOrderWaitNewStateToWatiOldState();
+    OrderEntity changeOrderWaitNewStateToWatiOldState();
 
 
     ResponseData<OrderDetailData> changOrderState(int orderId, int orderState);
@@ -28,4 +28,6 @@ public interface OrderService {
 
     ResponseData<OrderDetailData> findOrderByDriverIdAndState(Integer[] states, String driverId);
 
+
+    void saveRelyTimeToOrder(int id);
 }

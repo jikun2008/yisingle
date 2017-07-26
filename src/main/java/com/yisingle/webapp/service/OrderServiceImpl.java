@@ -83,6 +83,7 @@ public class OrderServiceImpl implements OrderService {
             entity.setPhoneNum(requestData.getPhoneNum());
             entity.setStartPlaceName(requestData.getStartPlaceName());
             entity.setEndPlaceName(requestData.getEndPlaceName());
+            entity.setCreateTime(System.currentTimeMillis());//设置订单生成时间
             entity.setStartLongitude(requestData.getStartLongitude());
             entity.setStartLatitude(requestData.getStartLatitude());
             entity.setEndLongitude(requestData.getEndLongitude());
@@ -127,24 +128,24 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    public void changeOrderWaitNewStateToWatiOldState() {
+    public OrderEntity changeOrderWaitNewStateToWatiOldState() {
 
         List<OrderEntity> orderEntityList = orderDao.findWaitNewStateOrder();
 
-        if (null == orderEntityList) {
-            return;
-        }
+        OrderEntity orderEntity = null;
 
-        if (orderEntityList.size() > 0) {
-            OrderEntity orderEntity = orderEntityList.get(0);
+        if (null != orderEntityList && orderEntityList.size() > 0) {
+            orderEntity = orderEntityList.get(0);
             List<DriverEntity> driverEntityList = driverDao.findDriverByState(DriverEntity.DriverState.State.WATI_FOR_ORDER.value());
             if (null != driverEntityList && driverEntityList.size() > 0) {
                 orderEntity.setOrderState(State.WATI_OLD.value());
                 orderEntity.setDriverEntity(driverEntityList.get(0));
+                orderDao.update(orderEntity);
             }
-            orderDao.update(orderEntity);
+
 
         }
+        return orderEntity;
 
     }
 
@@ -259,6 +260,16 @@ public class OrderServiceImpl implements OrderService {
             responseData.setErrorMsg("未找到订单");
         }
         return responseData;
+
+    }
+
+    public void saveRelyTimeToOrder(int id) {
+
+        OrderEntity orderEntity = orderDao.find(Integer.valueOf(id));
+        if (null != orderEntity) {
+            orderEntity.setDriverRelyTime(System.currentTimeMillis());
+            orderDao.save(orderEntity);
+        }
 
     }
 
