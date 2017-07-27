@@ -6,6 +6,8 @@ import com.yisingle.webapp.data.ResponseData;
 import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.entity.UserEntity;
 
+import java.util.List;
+
 /**
  * Created by jikun on 17/6/25.
  */
@@ -17,13 +19,15 @@ public interface OrderService {
 
     OrderEntity changeOrderWaitNewStateToWatiOldState();
 
+    List<OrderEntity> checkWaitOldOrder();
+
 
     ResponseData<OrderDetailData> changOrderState(int orderId, int orderState);
 
 
     ResponseData<OrderDetailData> acceptDriverOrder(int orderId);
 
-    ResponseData<OrderDetailData>  finishDriverOrder(int orderId);
+    ResponseData<OrderDetailData> finishDriverOrder(int orderId);
 
 
     ResponseData<OrderDetailData> findOrderByDriverIdAndState(Integer[] states, String driverId);

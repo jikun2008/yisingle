@@ -14,11 +14,19 @@ import com.yisingle.webapp.data.SocketData;
 import com.yisingle.webapp.data.SocketHeadData;
 import com.yisingle.webapp.entity.DriverEntity;
 import com.yisingle.webapp.entity.OrderEntity;
+import com.yisingle.webapp.job.OrderJob;
+import com.yisingle.webapp.job.QuartzManager;
 import com.yisingle.webapp.service.DriverService;
 import com.yisingle.webapp.service.OrderService;
 import com.yisingle.webapp.utils.JsonUtils;
 import org.apache.commons.logging.impl.SimpleLog;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
@@ -31,7 +39,7 @@ import java.util.Map;
  * @author jikun
  */
 @Component
-public class SystemWebSocketHandler implements WebSocketHandler {
+public class SystemWebSocketHandler implements WebSocketHandler, ApplicationListener {
 
 
     @Autowired
@@ -158,7 +166,9 @@ public class SystemWebSocketHandler implements WebSocketHandler {
 
     public void sendOrderToDriver(String id, OrderEntity orderEntity) {
         try {
+
             WebSocketSession socketSession = driverMap.get(id);
+            simpleLog.info("orderJob sendOrderToDriver=socketSession---==" + socketSession);
             if (null != socketSession) {
 
                 OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
@@ -178,4 +188,29 @@ public class SystemWebSocketHandler implements WebSocketHandler {
         }
     }
 
+    public void onApplicationEvent(ApplicationEvent event) {
+
+        simpleLog.info("onApplicationEvent Call Back");
+        try {
+            startJob();
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startJob() throws SchedulerException {
+        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+        Scheduler scheduler = schedulerFactory.getScheduler();
+        QuartzManager quartzManager = new QuartzManager(scheduler);
+        simpleLog.info("startJob()");
+
+        if (!scheduler.isStarted()) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("id", 1);
+            // 每1000毫秒执行一次，重复执行
+            quartzManager.addJob("myJob", "test", OrderJob.class, map, 2000l, -1);
+            quartzManager.startScheduler();
+        }
+
+    }
 }

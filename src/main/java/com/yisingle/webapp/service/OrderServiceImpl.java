@@ -1,6 +1,5 @@
 package com.yisingle.webapp.service;
 
-import com.sun.tools.corba.se.idl.constExpr.Or;
 import com.yisingle.webapp.dao.DriverDao;
 import com.yisingle.webapp.dao.OrderDao;
 import com.yisingle.webapp.dao.UserDao;
@@ -9,26 +8,13 @@ import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
 import com.yisingle.webapp.entity.DriverEntity;
 import com.yisingle.webapp.entity.OrderEntity;
+import com.yisingle.webapp.entity.OrderEntity.OrderState.State;
 import com.yisingle.webapp.entity.UserEntity;
-
-import com.yisingle.webapp.job.OrderJob;
-import com.yisingle.webapp.job.QuartzManager;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.HashMap;
-
 import java.util.List;
-import java.util.Map;
-
-
-import com.yisingle.webapp.entity.OrderEntity.OrderState.State;
 
 /**
  * Created by jikun on 17/6/25.
@@ -101,11 +87,11 @@ public class OrderServiceImpl implements OrderService {
 
 
         }
-        try {
-            startJob();
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            startJob();
+//        } catch (SchedulerException e) {
+//            e.printStackTrace();
+//        }
 
         return responseData;
 
@@ -113,20 +99,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    private void startJob() throws SchedulerException {
-        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-        Scheduler scheduler = schedulerFactory.getScheduler();
-        QuartzManager quartzManager = new QuartzManager(scheduler);
-
-        if (!scheduler.isStarted()) {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("id", 1);
-            // 每1000毫秒执行一次，重复执行
-            quartzManager.addJob("myJob", "test", OrderJob.class, map, 6000l, -1);
-            quartzManager.startScheduler();
-        }
-
-    }
+//    private void startJob() throws SchedulerException {
+//        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+//        Scheduler scheduler = schedulerFactory.getScheduler();
+//        QuartzManager quartzManager = new QuartzManager(scheduler);
+//
+//        if (!scheduler.isStarted()) {
+//            Map<String, Object> map = new HashMap<String, Object>();
+//            map.put("id", 1);
+//            // 每1000毫秒执行一次，重复执行
+//            quartzManager.addJob("myJob", "test", OrderJob.class, map, 6000l, -1);
+//            quartzManager.startScheduler();
+//        }
+//
+//    }
 
     public OrderEntity changeOrderWaitNewStateToWatiOldState() {
 
@@ -137,16 +123,30 @@ public class OrderServiceImpl implements OrderService {
         if (null != orderEntityList && orderEntityList.size() > 0) {
             orderEntity = orderEntityList.get(0);
             List<DriverEntity> driverEntityList = driverDao.findDriverByState(DriverEntity.DriverState.State.WATI_FOR_ORDER.value());
-            if (null != driverEntityList && driverEntityList.size() > 0) {
-                orderEntity.setOrderState(State.WATI_OLD.value());
-                orderEntity.setDriverEntity(driverEntityList.get(0));
-                orderDao.update(orderEntity);
+
+            for (DriverEntity driverEntity : driverEntityList) {
+                List<OrderEntity> orderEntities = orderDao.findOrderByDriverIdAndState(new Integer[]{State.WATI_OLD.value()}, driverEntity.getId() + "");
+
+                boolean isHaverOrder = orderEntities != null && orderEntities.size() > 0;
+                if (!isHaverOrder) {
+                    //如果没有订单才分配订单给
+                    orderEntity.setOrderState(State.WATI_OLD.value());
+                    orderEntity.setDriverEntity(driverEntity);
+                    orderDao.update(orderEntity);
+                    break;
+                }
+
             }
 
 
         }
         return orderEntity;
 
+    }
+
+    public List<OrderEntity> checkWaitOldOrder() {
+        List<OrderEntity> orderEntityList = orderDao.findOrderByState(new Integer[]{State.WATI_OLD.value()});
+        return orderEntityList;
     }
 
     public ResponseData<OrderDetailData> changOrderState(int orderId, int orderState) {

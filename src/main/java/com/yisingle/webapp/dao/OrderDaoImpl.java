@@ -78,6 +78,15 @@ public class OrderDaoImpl implements OrderDao {
         return list;
     }
 
+    public List<OrderEntity> findOrderByState(Integer[] states) {
+        Session session = sessionFactory.getCurrentSession();
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList)").addEntity(OrderEntity.class);
+
+        sqlQuery.setParameterList("valueList", states);
+        List<OrderEntity> list = sqlQuery.list();
+        return list;
+    }
+
     public List<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId) {
         Session session = sessionFactory.getCurrentSession();
         SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList) AND driverid= (:valueId)").addEntity(OrderEntity.class);

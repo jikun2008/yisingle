@@ -2,6 +2,7 @@ package com.yisingle.webapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.annotation.Lazy;
@@ -9,11 +10,13 @@ import org.springframework.context.annotation.Lazy;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.lang.annotation.*;
+import java.math.BigDecimal;
+import java.util.Set;
 
 /**
  * Created by jikun on 17/5/2.
  */
-@JsonIgnoreProperties({"userEntity", "driverEntity"})
+@JsonIgnoreProperties({"userEntity", "driverEntity", "setOrderCoordinateEntity"})
 @Entity
 @Table(name = "t_order")
 public class OrderEntity implements Serializable, Cloneable {
@@ -57,6 +60,10 @@ public class OrderEntity implements Serializable, Cloneable {
     private String endPlaceName;
 
 
+    //订单金额
+    private BigDecimal orderPrice;
+
+
     private int orderState;
 
     //订单创建时间
@@ -76,6 +83,13 @@ public class OrderEntity implements Serializable, Cloneable {
     @ManyToOne
     @JoinColumn(name = "driverid")
     private DriverEntity driverEntity;
+
+
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY)
+    @Cascade(value = {org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+    @JoinColumn(name = "orderId")
+    private Set<OrderCoordinateEntity> setOrderCoordinateEntity;
 
 
     public long getCreateTime() {
@@ -173,6 +187,22 @@ public class OrderEntity implements Serializable, Cloneable {
 
     public void setDriverEntity(DriverEntity driverEntity) {
         this.driverEntity = driverEntity;
+    }
+
+    public BigDecimal getOrderPrice() {
+        return orderPrice;
+    }
+
+    public void setOrderPrice(BigDecimal orderPrice) {
+        this.orderPrice = orderPrice;
+    }
+
+    public Set<OrderCoordinateEntity> getSetOrderCoordinateEntity() {
+        return setOrderCoordinateEntity;
+    }
+
+    public void setSetOrderCoordinateEntity(Set<OrderCoordinateEntity> setOrderCoordinateEntity) {
+        this.setOrderCoordinateEntity = setOrderCoordinateEntity;
     }
 
     /**

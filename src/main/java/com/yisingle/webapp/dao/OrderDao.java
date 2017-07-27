@@ -29,6 +29,7 @@ public interface OrderDao {
 
     List<OrderEntity> findOrderByDriverId(String driverId);
 
+    List<OrderEntity> findOrderByState(Integer[] states);
 
-     List<OrderEntity> findOrderByDriverIdAndState(Integer[] states,String driverId);
+    List<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId);
 }
