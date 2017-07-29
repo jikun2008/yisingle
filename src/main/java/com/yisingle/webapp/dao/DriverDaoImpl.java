@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class DriverDaoimpl implements DriverDao {
+public class DriverDaoImpl implements DriverDao {
 
     @Autowired
     private SessionFactory sessionFactory;

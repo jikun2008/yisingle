@@ -32,4 +32,7 @@ public interface OrderDao {
     List<OrderEntity> findOrderByState(Integer[] states);
 
     List<OrderEntity> findOrderByDriverIdAndState(Integer[] states, String driverId);
+
+
+    List<OrderEntity> findTodayOrder(Integer[] states, String driverId);
 }

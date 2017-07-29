@@ -17,4 +17,6 @@ public interface DriverService {
     void saveLocationPointToDriver(HeartBeatData data);
 
 
+
+
 }

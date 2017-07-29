@@ -37,6 +37,8 @@ public class OrderCoordinateEntity {
     @JoinColumn(name = "orderId")
     private OrderEntity orderEntity;
 
+    private int calculateType = CalculateType.NOT_CALCULATE.value();
+
 
     public int getId() {
         return id;
@@ -77,5 +79,29 @@ public class OrderCoordinateEntity {
 
     public void setOrderEntity(OrderEntity orderEntity) {
         this.orderEntity = orderEntity;
+    }
+
+    public int getCalculateType() {
+        return calculateType;
+    }
+
+    public void setCalculateType(int calculateType) {
+        this.calculateType = calculateType;
+    }
+
+    public static enum CalculateType {
+
+        IS_CALCULATE(1), NOT_CALCULATE(2);
+
+        int type;
+
+        CalculateType(int type) {
+            this.type = type;
+        }
+
+
+        public int value() {
+            return type;
+        }
     }
 }

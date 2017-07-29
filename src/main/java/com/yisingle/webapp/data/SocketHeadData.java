@@ -44,7 +44,7 @@ public class SocketHeadData  implements Serializable {
 
     public  enum Type {
         // 利用构造函数传参
-        ILLEGAL_DATA(-1),HEART_BEAT(1),ORDER_NEW(2);
+        ILLEGAL_DATA(-1),HEART_BEAT(1),ORDER_NEW(2),ORDER_PRICE(3);
 
         // 定义私有变量
         private int code;

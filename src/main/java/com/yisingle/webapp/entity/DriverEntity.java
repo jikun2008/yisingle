@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Lazy;
 /**
  * Created by jikun on 17/6/26.
  */
-@JsonIgnoreProperties({ "setOrderEntity"})
+@JsonIgnoreProperties({"setOrderEntity"})
 @Entity
 @Table(name = "t_driver")
 public class DriverEntity implements Serializable {
@@ -56,6 +56,10 @@ public class DriverEntity implements Serializable {
 
 
     private long onlineTime = 0;
+
+
+    @Column(columnDefinition = "INT default 100")
+    private int driver_score;//默认评分字段
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY)
@@ -136,6 +140,14 @@ public class DriverEntity implements Serializable {
 
     public void setOnlineTime(long onlineTime) {
         this.onlineTime = onlineTime;
+    }
+
+    public int getDriver_score() {
+        return driver_score;
+    }
+
+    public void setDriver_score(int driver_score) {
+        this.driver_score = driver_score;
     }
 
     /**

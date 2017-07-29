@@ -74,6 +74,10 @@ public class OrderEntity implements Serializable, Cloneable {
     private long driverRelyTime;
 
 
+    //花费的总时间
+    private long costTime;
+
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userid")
@@ -204,6 +208,15 @@ public class OrderEntity implements Serializable, Cloneable {
     public void setSetOrderCoordinateEntity(Set<OrderCoordinateEntity> setOrderCoordinateEntity) {
         this.setOrderCoordinateEntity = setOrderCoordinateEntity;
     }
+
+    public long getCostTime() {
+        return costTime;
+    }
+
+    public void setCostTime(long costTime) {
+        this.costTime = costTime;
+    }
+
 
     /**
      * 订单状态注解

@@ -17,6 +17,7 @@ import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.job.OrderJob;
 import com.yisingle.webapp.job.QuartzManager;
 import com.yisingle.webapp.service.DriverService;
+import com.yisingle.webapp.service.OrderCoordinateService;
 import com.yisingle.webapp.service.OrderService;
 import com.yisingle.webapp.utils.JsonUtils;
 import org.apache.commons.logging.impl.SimpleLog;
@@ -48,6 +49,10 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
 
     @Autowired
     private OrderService orderService;
+
+
+    @Autowired
+    private OrderCoordinateService orderCoordinateService;
 
     private SimpleLog simpleLog = new SimpleLog(SystemWebSocketHandler.class.getSimpleName());
     private Gson gson = new Gson();
@@ -129,11 +134,15 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
         if (headData.getType() == SocketData.Type.HEART_BEAT.value()) {
             SocketData<HeartBeatData> socketData = gson.fromJson(jsonData, new TypeToken<SocketData<HeartBeatData>>() {
             }.getType());
-            socketData.setMsg("服务器收到了心跳数据");
+            socketData.setMsg("接受心跳数据");
 
             String json = new Gson().toJson(socketData);
             sendMsg(session, json);
             driverService.saveLocationPointToDriver(socketData.getResponse());
+
+            //如果现在司机当前有订单，对订单的坐标进行保存
+            orderCoordinateService.saveOrderDriverLatLongToOrder(socketData.getResponse());
+
 
         } else if (headData.getType() == SocketData.Type.ORDER_NEW.value()) {
 
@@ -173,7 +182,7 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
 
                 OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
                 SocketData<OrderDetailData> socketData = new SocketData<OrderDetailData>();
-                socketData.setMsg("服务发送过来的订单数据");
+                socketData.setMsg("新订单");
                 socketData.setCode(0);
                 socketData.setType(SocketData.Type.ORDER_NEW.value());
                 socketData.setResponse(orderDetailData);
@@ -183,7 +192,32 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
 
             }
         } catch (IOException e) {
-            simpleLog.info("发送订单数据报错sendOrderToDriver()" + e.toString());
+            simpleLog.info("新订单发送报错sendOrderToDriver()" + e.toString());
+            e.printStackTrace();
+        }
+    }
+
+
+    public void sendPrcieToDriver(String id, OrderEntity orderEntity) {
+        try {
+
+            WebSocketSession socketSession = driverMap.get(id);
+            simpleLog.info("orderJob sendOrderToDriver=socketSession---==" + socketSession);
+            if (null != socketSession) {
+
+                OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
+                SocketData<OrderDetailData> socketData = new SocketData<OrderDetailData>();
+                socketData.setMsg("价格订单发送");
+                socketData.setCode(0);
+                socketData.setType(SocketData.Type.ORDER_PRICE.value());
+                socketData.setResponse(orderDetailData);
+
+                String json = new Gson().toJson(socketData);
+                sendMsg(socketSession, json);
+
+            }
+        } catch (IOException e) {
+            simpleLog.info("价格订单发送报错sendOrderToDriver()" + e.toString());
             e.printStackTrace();
         }
     }

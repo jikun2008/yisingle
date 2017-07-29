@@ -140,4 +140,18 @@ public class DriverController extends BaseController {
     }
 
 
+    @RequestMapping(method = RequestMethod.POST, value = "/driver/getTodayStatistics")
+    @ResponseBody
+    public ResponseData<DriverStatisticData> getTodayStatistics(@Valid @RequestBody DriverStatisticRequestData requestData, BindingResult bindingResult) {
+        ResponseData<DriverStatisticData> data = new ResponseData();
+
+        if (bindingResult.hasErrors()) {
+            data.setErrorMsg(BindingResultUtils.getError(bindingResult));
+        } else {
+            data = orderService.getOrderConutAndMoney(requestData.getDriverId());
+
+
+        }
+        return data;
+    }
 }

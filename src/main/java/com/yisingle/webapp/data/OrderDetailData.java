@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * Created by jikun on 17/7/13.
@@ -50,6 +51,12 @@ public class OrderDetailData implements Serializable {
     private int orderState;
 
 
+    private BigDecimal orderPrice;
+
+    //花费的总时间
+    private long costTime;
+
+
     private DriverEntity driver;
 
     private UserEntity user;
@@ -66,6 +73,8 @@ public class OrderDetailData implements Serializable {
         this.orderState = entity.getOrderState();
         this.createTime = entity.getCreateTime();
         this.driverRelyTime = entity.getDriverRelyTime();
+        this.costTime = entity.getCostTime();
+        this.orderPrice = entity.getOrderPrice();
     }
 
     public int getId() {
@@ -171,5 +180,21 @@ public class OrderDetailData implements Serializable {
 
     public void setDriverRelyTime(long driverRelyTime) {
         this.driverRelyTime = driverRelyTime;
+    }
+
+    public long getCostTime() {
+        return costTime;
+    }
+
+    public void setCostTime(long costTime) {
+        this.costTime = costTime;
+    }
+
+    public BigDecimal getOrderPrice() {
+        return orderPrice;
+    }
+
+    public void setOrderPrice(BigDecimal orderPrice) {
+        this.orderPrice = orderPrice;
     }
 }

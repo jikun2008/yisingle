@@ -2,6 +2,7 @@ package com.yisingle.webapp.dao;
 
 import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.entity.UserEntity;
+import com.yisingle.webapp.utils.TimeUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -93,6 +94,18 @@ public class OrderDaoImpl implements OrderDao {
 
         sqlQuery.setParameterList("valueList", states);
         sqlQuery.setParameter("valueId", driverId);
+        List<OrderEntity> list = sqlQuery.list();
+        return list;
+    }
+
+    public List<OrderEntity> findTodayOrder(Integer[] states, String driverId) {
+        Session session = sessionFactory.getCurrentSession();
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList) AND driverid= (:valueId) AND createTime > (:frontTime) AND createTime < (:backTime)").addEntity(OrderEntity.class);
+
+        sqlQuery.setParameterList("valueList", states);
+        sqlQuery.setParameter("valueId", driverId);
+        sqlQuery.setParameter("frontTime", TimeUtils.getTodayStartTime());
+        sqlQuery.setParameter("backTime", TimeUtils.getTodayEndTime());
         List<OrderEntity> list = sqlQuery.list();
         return list;
     }

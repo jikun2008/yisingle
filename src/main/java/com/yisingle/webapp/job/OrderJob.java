@@ -1,6 +1,8 @@
 package com.yisingle.webapp.job;
 
 import com.yisingle.webapp.entity.OrderEntity;
+import com.yisingle.webapp.service.DriverService;
+import com.yisingle.webapp.service.OrderCoordinateService;
 import com.yisingle.webapp.service.OrderService;
 import com.yisingle.webapp.websocket.SystemWebSocketHandler;
 import org.apache.commons.logging.impl.SimpleLog;
@@ -15,11 +17,19 @@ import java.util.List;
  */
 public class OrderJob implements Job {
 
+
+    @Autowired
+    DriverService driverService;
+
     @Autowired
     private OrderService orderService;
 
     @Autowired
     private SystemWebSocketHandler systemWebSocketHandler;
+
+
+    @Autowired
+    private OrderCoordinateService orderCoordinateService;
 
     private SimpleLog simpleLog = new SimpleLog(OrderJob.class.getSimpleName());
 
@@ -32,6 +42,23 @@ public class OrderJob implements Job {
 
 
         simpleLog.info("orderJob 工作中");
+
+        sendNewOrder();
+        sendOldOrder();
+
+        calculateOrderMoney();
+
+        sendPriceOrder();
+
+
+    }
+
+    private void calculateOrderMoney() {
+
+        orderCoordinateService.calculateCostMoney();
+    }
+
+    private void sendNewOrder() {
         OrderEntity orderEntity = orderService.changeOrderWaitNewStateToWatiOldState();
 
         if (null != orderEntity && null != orderEntity.getDriverEntity()) {
@@ -39,8 +66,9 @@ public class OrderJob implements Job {
             simpleLog.info("发送全新的订单给司机--司机号码:" + orderEntity.getDriverEntity().getPhonenum());
             systemWebSocketHandler.sendOrderToDriver(orderEntity.getDriverEntity().getId() + "", orderEntity);
         }
+    }
 
-
+    private void sendOldOrder() {
         List<OrderEntity> orderEntityList = orderService.checkWaitOldOrder();
         for (OrderEntity oldOrderEntity : orderEntityList) {
             if (null != oldOrderEntity.getDriverEntity()) {
@@ -48,17 +76,25 @@ public class OrderJob implements Job {
                 long time = System.currentTimeMillis() - oldOrderEntity.getDriverRelyTime();
 
                 simpleLog.info("orderJob time=" + time);
-                if (time >= 1* 60 * 1000) {
+                if (time >= 2 * 60 * 1000) {
                     //如果大于两分钟那么就发送订单
                     simpleLog.info("orderJob id=" + oldOrderEntity.getDriverEntity().getId());
                     simpleLog.info("orderJob 号码=" + oldOrderEntity.getDriverEntity().getPhonenum());
                     systemWebSocketHandler.sendOrderToDriver(oldOrderEntity.getDriverEntity().getId() + "", oldOrderEntity);
                 }
-
-
             }
-
         }
 
     }
+
+    /**
+     * 发送有价格的订单
+     */
+    private void sendPriceOrder() {
+
+
+        orderService.sendPrice();
+
+    }
+
 }

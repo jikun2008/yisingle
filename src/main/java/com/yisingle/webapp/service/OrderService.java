@@ -1,5 +1,6 @@
 package com.yisingle.webapp.service;
 
+import com.yisingle.webapp.data.DriverStatisticData;
 import com.yisingle.webapp.data.OrderDetailData;
 import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
@@ -34,4 +35,10 @@ public interface OrderService {
 
 
     void saveRelyTimeToOrder(int id);
+
+
+    void sendPrice();
+
+
+    ResponseData<DriverStatisticData> getOrderConutAndMoney(int drivierId);
 }

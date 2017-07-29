@@ -3,6 +3,7 @@ package com.yisingle.webapp.service;
 import com.yisingle.webapp.dao.DriverDao;
 import com.yisingle.webapp.dao.OrderDao;
 import com.yisingle.webapp.dao.UserDao;
+import com.yisingle.webapp.data.DriverStatisticData;
 import com.yisingle.webapp.data.OrderDetailData;
 import com.yisingle.webapp.data.OrderRequestData;
 import com.yisingle.webapp.data.ResponseData;
@@ -10,10 +11,12 @@ import com.yisingle.webapp.entity.DriverEntity;
 import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.entity.OrderEntity.OrderState.State;
 import com.yisingle.webapp.entity.UserEntity;
+import com.yisingle.webapp.websocket.SystemWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -31,6 +34,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private SystemWebSocketHandler systemWebSocketHandler;
 
 
     public ResponseData<OrderDetailData> generateWaitOrder(OrderRequestData requestData, UserEntity userEntity) {
@@ -148,6 +154,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderEntity> orderEntityList = orderDao.findOrderByState(new Integer[]{State.WATI_OLD.value()});
         return orderEntityList;
     }
+
 
     public ResponseData<OrderDetailData> changOrderState(int orderId, int orderState) {
         ResponseData<OrderDetailData> responseData = new ResponseData();
@@ -271,6 +278,42 @@ public class OrderServiceImpl implements OrderService {
             orderDao.save(orderEntity);
         }
 
+    }
+
+    public void sendPrice() {
+
+
+        List<OrderEntity> orderEntityList = orderDao.findOrderByState(new Integer[]{State.DRIVER_ARRIVE.value(), State.PASSENGER_IN_CAR.value(), State.PASSENGER_OUT_CAR.value()});
+
+        for (OrderEntity orderEntity : orderEntityList) {
+
+            if (null != orderEntity && null != orderEntity.getDriverEntity())
+                systemWebSocketHandler.sendPrcieToDriver(orderEntity.getDriverEntity().getId() + "", orderEntity);
+        }
+    }
+
+    public ResponseData<DriverStatisticData> getOrderConutAndMoney(int drivierId) {
+
+        ResponseData<DriverStatisticData> data = new ResponseData<DriverStatisticData>();
+        List<OrderEntity> orderEntityList = orderDao.findTodayOrder(new Integer[]{State.HAVE_COMPLETE.value()}, drivierId + "");
+
+        data.setCode(ResponseData.Code.SUCCESS.value());
+        int count = 0;
+        BigDecimal money = new BigDecimal(0);
+        DriverStatisticData statisticData = new DriverStatisticData(0, money);
+        if (orderEntityList != null && orderEntityList.size() > 0) {
+            count = orderEntityList.size();
+            for (OrderEntity orderEntity : orderEntityList) {
+                money = money.add(orderEntity.getOrderPrice());
+            }
+
+            statisticData.setToday_order_count(count);
+            statisticData.setToday_order_gain(money);
+
+
+        }
+        data.setResponse(statisticData);
+        return data;
     }
 
 
