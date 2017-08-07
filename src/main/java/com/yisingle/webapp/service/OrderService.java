@@ -37,8 +37,19 @@ public interface OrderService {
     void saveRelyTimeToOrder(int id);
 
 
-    void sendPrice();
+    void sendPriceToDriver();
 
 
     ResponseData<DriverStatisticData> getOrderConutAndMoney(int drivierId);
+
+    void savePassengerRelyStateToOrder(int id);
+
+
+    void sendOrderStateChangeToPassenger();
+
+
+    void sendPriceOrderToPassenger();
+
+
+
 }

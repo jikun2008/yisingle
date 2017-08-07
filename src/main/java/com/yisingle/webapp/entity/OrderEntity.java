@@ -1,7 +1,7 @@
 package com.yisingle.webapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -61,7 +61,7 @@ public class OrderEntity implements Serializable, Cloneable {
 
 
     //订单金额
-    private BigDecimal orderPrice;
+    private BigDecimal orderPrice = new BigDecimal(0);
 
 
     private int orderState;
@@ -76,6 +76,9 @@ public class OrderEntity implements Serializable, Cloneable {
 
     //花费的总时间
     private long costTime;
+
+
+    private int passengerRelyState = PassengerRelyStates.NO_RECEIVED.value();
 
 
     @JsonIgnore
@@ -205,6 +208,15 @@ public class OrderEntity implements Serializable, Cloneable {
         return setOrderCoordinateEntity;
     }
 
+
+    public int getPassengerRelyState() {
+        return passengerRelyState;
+    }
+
+    public void setPassengerRelyState(int passengerRelyState) {
+        this.passengerRelyState = passengerRelyState;
+    }
+
     public void setSetOrderCoordinateEntity(Set<OrderCoordinateEntity> setOrderCoordinateEntity) {
         this.setOrderCoordinateEntity = setOrderCoordinateEntity;
     }
@@ -258,6 +270,20 @@ public class OrderEntity implements Serializable, Cloneable {
         }
 
 
+    }
+
+    public enum PassengerRelyStates {
+        HAVE_RECEIVED(1),
+        NO_RECEIVED(2);
+        int state;
+
+        PassengerRelyStates(int state) {
+            this.state = state;
+        }
+
+        public int value() {
+            return state;
+        }
     }
 
     @Override

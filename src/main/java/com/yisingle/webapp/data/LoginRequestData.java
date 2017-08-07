@@ -18,13 +18,12 @@ public class LoginRequestData implements Serializable {
     private String password;
 
 
+    @NotEmpty(message = "phonenum不能为空")
     @Pattern(regexp = PredicateFormatString.MOBILE, message = "请输入正确的手机号")
     private String phonenum;
 
 
-    @NotEmpty(message = "password不能为空")
-    @Pattern(regexp = PredicateFormatString.EMAIL, message = "请输入正确的邮箱")
-    private String email;
+    private String email = "test@qq.com";
 
 
     public String getUsername() {

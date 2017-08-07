@@ -5,21 +5,24 @@
  */
 package com.yisingle.webapp.websocket;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.yisingle.webapp.dao.DriverDao;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.yisingle.webapp.data.HeartBeatData;
 import com.yisingle.webapp.data.OrderDetailData;
 import com.yisingle.webapp.data.SocketData;
 import com.yisingle.webapp.data.SocketHeadData;
-import com.yisingle.webapp.entity.DriverEntity;
+
 import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.job.OrderJob;
+import com.yisingle.webapp.job.PassengerOrderJob;
 import com.yisingle.webapp.job.QuartzManager;
 import com.yisingle.webapp.service.DriverService;
 import com.yisingle.webapp.service.OrderCoordinateService;
 import com.yisingle.webapp.service.OrderService;
-import com.yisingle.webapp.utils.JsonUtils;
+
 import org.apache.commons.logging.impl.SimpleLog;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -34,13 +37,14 @@ import org.springframework.web.socket.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 ;
 
 /**
  * @author jikun
  */
 @Component
-public class SystemWebSocketHandler implements WebSocketHandler, ApplicationListener {
+public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebSocketHandler, ApplicationListener {
 
 
     @Autowired
@@ -55,8 +59,7 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
     private OrderCoordinateService orderCoordinateService;
 
     private SimpleLog simpleLog = new SimpleLog(SystemWebSocketHandler.class.getSimpleName());
-    private Gson gson = new Gson();
-
+    ObjectMapper mapper = new ObjectMapper();
 
     private Map<String, WebSocketSession> driverMap = new HashMap<String, WebSocketSession>();
 
@@ -67,38 +70,6 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
             driverMap.put(driverId, session);
         }
 
-    }
-
-    public void handleMessage(WebSocketSession wss, WebSocketMessage<?> wsm) {
-
-        TextMessage returnMessage = new TextMessage(wsm.getPayload() + "");
-
-        String jsonData = returnMessage.getPayload();
-        String errorMsg = "";
-
-        simpleLog.info("websocket服务器接收到数据=" + returnMessage.getPayload());
-
-        try {
-            if (JsonUtils.isGoodJson(returnMessage.getPayload())) {
-
-                collatingData(jsonData, wss);
-            } else {
-                simpleLog.info("数据不合法");
-                errorMsg = "传递数据不是json格式";
-                sendInvalidData(wss, errorMsg);
-            }
-        } catch (Exception e) {
-            simpleLog.info("" + e.toString());
-        }
-
-
-    }
-
-    private void sendMsg(WebSocketSession session, String info) throws IOException {
-        simpleLog.info("websocket服务器发送的数据=" + info);
-        TextMessage msg = new TextMessage(info);
-
-        session.sendMessage(msg);
     }
 
 
@@ -129,70 +100,60 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
     /**
      * 整理数据
      */
-    private void collatingData(String jsonData, WebSocketSession session) throws IOException {
-        SocketHeadData headData = gson.fromJson(jsonData, SocketHeadData.class);
-        if (headData.getType() == SocketData.Type.HEART_BEAT.value()) {
-            SocketData<HeartBeatData> socketData = gson.fromJson(jsonData, new TypeToken<SocketData<HeartBeatData>>() {
-            }.getType());
-            socketData.setMsg("接受心跳数据");
-
-            String json = new Gson().toJson(socketData);
-            sendMsg(session, json);
-            driverService.saveLocationPointToDriver(socketData.getResponse());
-
-            //如果现在司机当前有订单，对订单的坐标进行保存
-            orderCoordinateService.saveOrderDriverLatLongToOrder(socketData.getResponse());
+    public void collatingData(String jsonData, WebSocketSession session) {
+        try {
 
 
-        } else if (headData.getType() == SocketData.Type.ORDER_NEW.value()) {
+            SocketHeadData headData = mapper.readValue(jsonData, SocketHeadData.class);
 
-            SocketData<OrderDetailData> socketData = gson.fromJson(jsonData, new TypeToken<SocketData<OrderDetailData>>() {
-            }.getType());
+            if (headData.getType() == SocketHeadData.Type.HEART_BEAT.value()) {
+                SocketData<HeartBeatData> socketData = mapper.readValue(jsonData, new TypeReference<SocketData<HeartBeatData>>() {
+                });
+                socketData.setMsg("接受心跳数据");
 
-            if (null != socketData && null != socketData.getResponse()) {
-                orderService.saveRelyTimeToOrder(socketData.getResponse().getId());
+                String json = mapper.writeValueAsString(socketData);
+                sendMsg(session, json);
+                driverService.saveLocationPointToDriver(socketData.getResponse());
+
+                //如果现在司机当前有订单，对订单的坐标进行保存
+                orderCoordinateService.saveOrderDriverLatLongToOrder(socketData.getResponse());
+
+
+            } else if (headData.getType() == SocketHeadData.Type.ORDER_NEW.value()) {
+
+                SocketData<OrderDetailData> socketData = mapper.readValue(jsonData, new TypeReference<SocketData<OrderDetailData>>() {
+                });
+
+                if (null != socketData && null != socketData.getResponse()) {
+                    orderService.saveRelyTimeToOrder(socketData.getResponse().getId());
+                }
+
+
+            } else {
+                simpleLog.info("type值未知");
             }
-
-
-        } else {
-            simpleLog.info("type值未知");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    }
-
-
-    private void sendInvalidData(WebSocketSession session, String errorMsg) throws IOException {
-        SocketHeadData data = new SocketHeadData();
-        data.setType(SocketData.Type.ILLEGAL_DATA.value());
-        data.setCode(-1);
-        data.setMsg(errorMsg);
-
-        String json = new Gson().toJson(data);
-
-        sendMsg(session, json);
-
     }
 
 
     public void sendOrderToDriver(String id, OrderEntity orderEntity) {
         try {
-
             WebSocketSession socketSession = driverMap.get(id);
             simpleLog.info("orderJob sendOrderToDriver=socketSession---==" + socketSession);
             if (null != socketSession) {
-
                 OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
                 SocketData<OrderDetailData> socketData = new SocketData<OrderDetailData>();
                 socketData.setMsg("新订单");
                 socketData.setCode(0);
-                socketData.setType(SocketData.Type.ORDER_NEW.value());
+                socketData.setType(SocketHeadData.Type.ORDER_NEW.value());
                 socketData.setResponse(orderDetailData);
+                String json = mapper.writeValueAsString(socketData);
 
-                String json = new Gson().toJson(socketData);
                 sendMsg(socketSession, json);
-
             }
-        } catch (IOException e) {
-            simpleLog.info("新订单发送报错sendOrderToDriver()" + e.toString());
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
@@ -200,7 +161,6 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
 
     public void sendPrcieToDriver(String id, OrderEntity orderEntity) {
         try {
-
             WebSocketSession socketSession = driverMap.get(id);
             simpleLog.info("orderJob sendOrderToDriver=socketSession---==" + socketSession);
             if (null != socketSession) {
@@ -209,15 +169,14 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
                 SocketData<OrderDetailData> socketData = new SocketData<OrderDetailData>();
                 socketData.setMsg("价格订单发送");
                 socketData.setCode(0);
-                socketData.setType(SocketData.Type.ORDER_PRICE.value());
+                socketData.setType(SocketHeadData.Type.ORDER_PRICE.value());
                 socketData.setResponse(orderDetailData);
 
-                String json = new Gson().toJson(socketData);
+                String json = mapper.writeValueAsString(socketData);
                 sendMsg(socketSession, json);
 
             }
-        } catch (IOException e) {
-            simpleLog.info("价格订单发送报错sendOrderToDriver()" + e.toString());
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
@@ -226,17 +185,20 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
 
         simpleLog.info("onApplicationEvent Call Back");
         try {
-            startJob();
+            startOrderJob();
+            startPassengerOrderJob();
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
     }
 
-    private void startJob() throws SchedulerException {
-        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
-        Scheduler scheduler = schedulerFactory.getScheduler();
+    private void startOrderJob() throws SchedulerException {
+//        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+//        Scheduler scheduler = schedulerFactory.getScheduler();
+
+        Scheduler scheduler = getScheduler("orderJob");
         QuartzManager quartzManager = new QuartzManager(scheduler);
-        simpleLog.info("startJob()");
+        simpleLog.info("startOrderJob()");
 
         if (!scheduler.isStarted()) {
             Map<String, Object> map = new HashMap<String, Object>();
@@ -246,5 +208,33 @@ public class SystemWebSocketHandler implements WebSocketHandler, ApplicationList
             quartzManager.startScheduler();
         }
 
+    }
+
+    private void startPassengerOrderJob() throws SchedulerException {
+//        SchedulerFactory schedulerFactory = new StdSchedulerFactory();
+//        Scheduler scheduler = schedulerFactory.getScheduler("passengerOrderJob");
+
+        Scheduler scheduler = getScheduler("passengerOrderJob");
+        QuartzManager quartzManager = new QuartzManager(scheduler);
+        simpleLog.info("startPassengerOrderJob()");
+
+        if (!scheduler.isStarted()) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("id", 2);
+            // 每10毫秒执行一次，重复执行
+            quartzManager.addJob("passengerJob", "passenger", PassengerOrderJob.class, map, 10000l, -1);
+            quartzManager.startScheduler();
+        }
+    }
+
+    private Scheduler getScheduler(String name) throws SchedulerException {
+        StdSchedulerFactory sf = new StdSchedulerFactory();
+        Properties props = new Properties();
+        props.put("org.quartz.scheduler.instanceName", name);
+        props.put("org.quartz.threadPool.threadCount", "10");
+        sf.initialize(props);
+        Scheduler scheduler = sf.getScheduler();
+
+        return scheduler;
     }
 }

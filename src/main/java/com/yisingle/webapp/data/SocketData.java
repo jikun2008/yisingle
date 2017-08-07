@@ -1,12 +1,45 @@
 package com.yisingle.webapp.data;
 
+
 import java.io.Serializable;
 
 /**
  * Created by jikun on 17/7/21.
  */
-public class SocketData<T> extends SocketHeadData implements Serializable {
 
+public class SocketData<T> implements Serializable {
+
+
+    private int type;
+
+    private int code;
+
+    private String msg;
+
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
     private T response;
 
@@ -19,6 +52,9 @@ public class SocketData<T> extends SocketHeadData implements Serializable {
         this.response = response;
     }
 
+    public SocketData() {
+        super();
+    }
 
     @Override
     public String toString() {

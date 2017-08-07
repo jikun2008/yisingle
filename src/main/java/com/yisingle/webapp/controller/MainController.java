@@ -33,7 +33,7 @@ public class MainController extends BaseController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/register")
+    @RequestMapping(method = RequestMethod.POST, value = "/passenger/register")
     @ResponseBody
     public ResponseData register(@Valid @RequestBody LoginRequestData loginRequestData, BindingResult bindingResult) {
 
@@ -52,7 +52,7 @@ public class MainController extends BaseController {
     }
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/login")
+    @RequestMapping(method = RequestMethod.POST, value = "/passenger/login")
     @ResponseBody
     public ResponseData login(@Valid @RequestBody LoginRequestData loginRequestData, BindingResult bindingResult) {
         ResponseData responseData = new ResponseData();

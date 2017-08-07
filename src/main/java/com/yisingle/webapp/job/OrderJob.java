@@ -4,6 +4,7 @@ import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.service.DriverService;
 import com.yisingle.webapp.service.OrderCoordinateService;
 import com.yisingle.webapp.service.OrderService;
+import com.yisingle.webapp.websocket.PassagerWebSocketHandler;
 import com.yisingle.webapp.websocket.SystemWebSocketHandler;
 import org.apache.commons.logging.impl.SimpleLog;
 import org.quartz.*;
@@ -48,7 +49,9 @@ public class OrderJob implements Job {
 
         calculateOrderMoney();
 
-        sendPriceOrder();
+        sendPriceOrderToDriver();
+
+        sendchangeOrderStateToPassenger();
 
 
     }
@@ -90,11 +93,17 @@ public class OrderJob implements Job {
     /**
      * 发送有价格的订单
      */
-    private void sendPriceOrder() {
+    private void sendPriceOrderToDriver() {
 
 
-        orderService.sendPrice();
+        orderService.sendPriceToDriver();
 
     }
+
+
+    private void sendchangeOrderStateToPassenger() {
+        orderService.sendOrderStateChangeToPassenger();
+    }
+
 
 }

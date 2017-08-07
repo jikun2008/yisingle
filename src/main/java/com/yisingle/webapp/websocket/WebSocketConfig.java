@@ -27,6 +27,7 @@ public class WebSocketConfig extends WebMvcConfigurerAdapter implements
         // registry.addHandler(systemWebSocketHandler(), "/sockjs/websck").addInterceptors(new HandshakeInterceptor())
         //        .withSockJS();
 
+        registry.addHandler(passagerWebSocketHandler(), "/passenger/websokcet").addInterceptors(new HandshakeInterceptor());
 
     }
 
@@ -36,6 +37,15 @@ public class WebSocketConfig extends WebMvcConfigurerAdapter implements
         //return new InfoSocketEndPoint();
         SystemWebSocketHandler handler = new SystemWebSocketHandler();
         System.out.println("测试代码SystemWebSocketHandler=====--------"+handler);
+        return handler;
+    }
+
+
+    @Bean
+    public WebSocketHandler passagerWebSocketHandler() {
+        //return new InfoSocketEndPoint();
+        PassagerWebSocketHandler handler = new PassagerWebSocketHandler();
+        System.out.println("测试代码PassagerWebSocketHandler=====--------"+handler);
         return handler;
     }
 

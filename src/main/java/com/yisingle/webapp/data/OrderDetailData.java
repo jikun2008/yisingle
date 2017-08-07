@@ -50,6 +50,9 @@ public class OrderDetailData implements Serializable {
 
     private int orderState;
 
+    //乘客司机是否收到改变
+    private int passengerRelyState;
+
 
     private BigDecimal orderPrice;
 
@@ -60,6 +63,11 @@ public class OrderDetailData implements Serializable {
     private DriverEntity driver;
 
     private UserEntity user;
+
+
+    public OrderDetailData() {
+        super();
+    }
 
     public OrderDetailData(OrderEntity entity) {
         this.id = entity.getId();
@@ -75,6 +83,7 @@ public class OrderDetailData implements Serializable {
         this.driverRelyTime = entity.getDriverRelyTime();
         this.costTime = entity.getCostTime();
         this.orderPrice = entity.getOrderPrice();
+        this.passengerRelyState = entity.getPassengerRelyState();
     }
 
     public int getId() {
@@ -196,5 +205,14 @@ public class OrderDetailData implements Serializable {
 
     public void setOrderPrice(BigDecimal orderPrice) {
         this.orderPrice = orderPrice;
+    }
+
+
+    public int getPassengerRelyState() {
+        return passengerRelyState;
+    }
+
+    public void setPassengerRelyState(int passengerRelyState) {
+        this.passengerRelyState = passengerRelyState;
     }
 }

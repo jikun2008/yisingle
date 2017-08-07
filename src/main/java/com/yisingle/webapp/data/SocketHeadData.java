@@ -1,12 +1,15 @@
 package com.yisingle.webapp.data;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 
 /**
  * Created by jikun on 17/7/24.
  */
-public class SocketHeadData  implements Serializable {
-
+@JsonIgnoreProperties({"response"})
+public class SocketHeadData implements Serializable {
 
 
     private int type;
@@ -14,7 +17,6 @@ public class SocketHeadData  implements Serializable {
     private int code;
 
     private String msg;
-
 
 
     public int getType() {
@@ -42,9 +44,9 @@ public class SocketHeadData  implements Serializable {
     }
 
 
-    public  enum Type {
+    public enum Type {
         // 利用构造函数传参
-        ILLEGAL_DATA(-1),HEART_BEAT(1),ORDER_NEW(2),ORDER_PRICE(3);
+        ILLEGAL_DATA(-1), HEART_BEAT(1), ORDER_NEW(2), ORDER_PRICE(3), PASSENGER_ORDER_STATES_CHANGE(4);
 
         // 定义私有变量
         private int code;

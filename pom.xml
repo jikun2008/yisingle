@@ -62,11 +62,7 @@
             <version>5.1.2.Final</version>
         </dependency>
         <!-- json数据 -->
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
-        </dependency>
+
 
 
         <!--orm管理-->

@@ -3,14 +3,12 @@ package com.yisingle.webapp.service;
 import com.yisingle.webapp.dao.DriverDao;
 import com.yisingle.webapp.dao.OrderDao;
 import com.yisingle.webapp.dao.UserDao;
-import com.yisingle.webapp.data.DriverStatisticData;
-import com.yisingle.webapp.data.OrderDetailData;
-import com.yisingle.webapp.data.OrderRequestData;
-import com.yisingle.webapp.data.ResponseData;
+import com.yisingle.webapp.data.*;
 import com.yisingle.webapp.entity.DriverEntity;
 import com.yisingle.webapp.entity.OrderEntity;
 import com.yisingle.webapp.entity.OrderEntity.OrderState.State;
 import com.yisingle.webapp.entity.UserEntity;
+import com.yisingle.webapp.websocket.PassagerWebSocketHandler;
 import com.yisingle.webapp.websocket.SystemWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,13 +36,24 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SystemWebSocketHandler systemWebSocketHandler;
 
+    @Autowired
+    private PassagerWebSocketHandler passagerWebSocketHandler;
+
 
     public ResponseData<OrderDetailData> generateWaitOrder(OrderRequestData requestData, UserEntity userEntity) {
 
         ResponseData<OrderDetailData> responseData = new ResponseData();
 
 
-        List<OrderEntity> list = orderDao.findWaitStateAndUserId(new Integer[]{State.WATI_NEW.value(), State.WATI_OLD.value(), State.HAVE_TAKE.value()}, userEntity.getId());
+        Integer[] stateList = new Integer[]{
+                State.WATI_NEW.value(),
+                State.WATI_OLD.value(),
+                State.HAVE_TAKE.value(),
+                State.DRIVER_ARRIVE.value(),
+                State.PASSENGER_IN_CAR.value(),
+                State.PASSENGER_OUT_CAR.value()
+        };
+        List<OrderEntity> list = orderDao.findWaitStateAndUserId(stateList, userEntity.getId());
 
         if (null != list && list.size() > 0) {
 
@@ -163,6 +172,7 @@ public class OrderServiceImpl implements OrderService {
 
 
             orderEntity.setOrderState(orderState);
+            orderEntity.setPassengerRelyState(OrderEntity.PassengerRelyStates.NO_RECEIVED.value());
             orderDao.save(orderEntity);
             UserEntity user = orderEntity.getUserEntity();
             DriverEntity driver = orderEntity.getDriverEntity();
@@ -225,6 +235,7 @@ public class OrderServiceImpl implements OrderService {
             DriverEntity driverEntity = orderEntity.getDriverEntity();
 
             driverEntity.setState(DriverEntity.DriverState.State.WATI_FOR_ORDER.value());
+            orderEntity.setPassengerRelyState(OrderEntity.PassengerRelyStates.NO_RECEIVED.value());
             orderDao.save(orderEntity);
 
             driverDao.save(driverEntity);
@@ -280,7 +291,7 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    public void sendPrice() {
+    public void sendPriceToDriver() {
 
 
         List<OrderEntity> orderEntityList = orderDao.findOrderByState(new Integer[]{State.DRIVER_ARRIVE.value(), State.PASSENGER_IN_CAR.value(), State.PASSENGER_OUT_CAR.value()});
@@ -314,6 +325,51 @@ public class OrderServiceImpl implements OrderService {
         }
         data.setResponse(statisticData);
         return data;
+    }
+
+    public void savePassengerRelyStateToOrder(int id) {
+        OrderEntity orderEntity = orderDao.find(Integer.valueOf(id));
+        if (null != orderEntity) {
+            orderEntity.setPassengerRelyState(OrderEntity.PassengerRelyStates.HAVE_RECEIVED.value());
+            orderDao.save(orderEntity);
+        }
+    }
+
+    public void sendOrderStateChangeToPassenger() {
+
+        Integer[] orderStateList = new Integer[]{
+                State.HAVE_TAKE.value(),
+                State.DRIVER_ARRIVE.value(),
+                State.PASSENGER_IN_CAR.value(),
+                State.PASSENGER_OUT_CAR.value(),
+                State.HAVE_COMPLETE.value()
+        };
+        Integer[] relyStateList = new Integer[]{
+                OrderEntity.PassengerRelyStates.NO_RECEIVED.value()
+        };
+        List<OrderEntity> orderEntityList = orderDao.findOrderByStateAndRelyState(orderStateList, relyStateList);
+
+        for (OrderEntity orderEntity : orderEntityList) {
+
+            if (null != orderEntity && null != orderEntity.getDriverEntity()){
+                System.out.println(" passagerWebSocketHandler.sendPrcieTPassenger()---ID="+orderEntity.getUserEntity().getId());
+                passagerWebSocketHandler.sendOrderToPassenger(orderEntity.getUserEntity().getId() + "", orderEntity, SocketHeadData.Type.PASSENGER_ORDER_STATES_CHANGE.value());
+            }
+
+        }
+
+    }
+
+    public void sendPriceOrderToPassenger() {
+
+
+        List<OrderEntity> orderEntityList = orderDao.findOrderByState(new Integer[]{State.DRIVER_ARRIVE.value(), State.PASSENGER_IN_CAR.value(), State.PASSENGER_OUT_CAR.value()});
+
+        for (OrderEntity orderEntity : orderEntityList) {
+
+            if (null != orderEntity && null != orderEntity.getUserEntity())
+                passagerWebSocketHandler.sendOrderToPassenger(orderEntity.getUserEntity().getId() + "", orderEntity, SocketHeadData.Type.ORDER_PRICE.value());
+        }
     }
 
 

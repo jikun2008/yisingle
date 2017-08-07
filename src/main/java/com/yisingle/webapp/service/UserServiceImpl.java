@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
             userDao.save(entity);
             code = ResponseData.Code.SUCCESS.value();
             errormsg = "";
+            responseData.setResponse(entity);
         }
         responseData.setCode(code);
         responseData.setErrorMsg(errormsg);
@@ -71,6 +72,7 @@ public class UserServiceImpl implements UserService {
         if (null != userEntity) {
             if (userEntity.getPassword().equals(data.getPassword())) {
                 code = ResponseData.Code.SUCCESS.value();
+                responseData.setResponse(userEntity);
                 errormsg = "登陆成功";
             } else {
                 code = ResponseData.Code.FAILED.value();

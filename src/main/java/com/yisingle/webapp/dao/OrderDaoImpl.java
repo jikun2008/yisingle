@@ -109,4 +109,15 @@ public class OrderDaoImpl implements OrderDao {
         List<OrderEntity> list = sqlQuery.list();
         return list;
     }
+
+    public List<OrderEntity> findOrderByStateAndRelyState(Integer[] states, Integer[] RelyState) {
+        Session session = sessionFactory.getCurrentSession();
+        SQLQuery sqlQuery = session.createSQLQuery("SELECT * from t_order WHERE orderState IN (:valueList) AND passengerRelyState IN (:relyState)").addEntity(OrderEntity.class);
+
+        sqlQuery.setParameterList("valueList", states);
+        sqlQuery.setParameterList("relyState", RelyState);
+
+        List<OrderEntity> list = sqlQuery.list();
+        return list;
+    }
 }
