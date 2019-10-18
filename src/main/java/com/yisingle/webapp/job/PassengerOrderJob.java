@@ -21,8 +21,6 @@ public class PassengerOrderJob implements Job {
     }
 
     private void sendPriceToPassenger() {
-
-        System.out.println("打印发送订单给乘客");
         orderService.sendPriceOrderToPassenger();
 
     }

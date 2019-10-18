@@ -82,7 +82,6 @@ public class PassagerWebSocketHandler extends BaseWebSocketHandler implements We
 
     public void sendOrderToPassenger(String id, OrderEntity orderEntity,int headDataType) {
         WebSocketSession socketSession = passagerMap.get(id);
-        simpleLog.info("orderJob sendPrcieTPassenger=socketSession---==" + socketSession);
         if (null != socketSession) {
             try {
                 OrderDetailData orderDetailData = new OrderDetailData(orderEntity);

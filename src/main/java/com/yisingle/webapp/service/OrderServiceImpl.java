@@ -352,7 +352,6 @@ public class OrderServiceImpl implements OrderService {
         for (OrderEntity orderEntity : orderEntityList) {
 
             if (null != orderEntity && null != orderEntity.getDriverEntity()){
-                System.out.println(" passagerWebSocketHandler.sendPrcieTPassenger()---ID="+orderEntity.getUserEntity().getId());
                 passagerWebSocketHandler.sendOrderToPassenger(orderEntity.getUserEntity().getId() + "", orderEntity, SocketHeadData.Type.PASSENGER_ORDER_STATES_CHANGE.value());
             }
 

@@ -77,12 +77,12 @@ public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebS
         if (wss.isOpen()) {
             wss.close();
         }
-        System.out.println("websocket connection closed......");
+
     }
 
 
     public void afterConnectionClosed(WebSocketSession session, CloseStatus cs) throws Exception {
-        System.out.println("websocket connection closed......");
+
 
         String driverId = session.getHandshakeHeaders().getFirst("driverId");
         if (null != driverId && !driverId.equals("")) {
@@ -141,7 +141,6 @@ public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebS
     public void sendOrderToDriver(String id, OrderEntity orderEntity) {
         try {
             WebSocketSession socketSession = driverMap.get(id);
-            simpleLog.info("orderJob sendOrderToDriver=socketSession---==" + socketSession);
             if (null != socketSession) {
                 OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
                 SocketData<OrderDetailData> socketData = new SocketData<OrderDetailData>();
@@ -162,7 +161,6 @@ public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebS
     public void sendPrcieToDriver(String id, OrderEntity orderEntity) {
         try {
             WebSocketSession socketSession = driverMap.get(id);
-            simpleLog.info("orderJob sendOrderToDriver=socketSession---==" + socketSession);
             if (null != socketSession) {
 
                 OrderDetailData orderDetailData = new OrderDetailData(orderEntity);
@@ -183,7 +181,7 @@ public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebS
 
     public void onApplicationEvent(ApplicationEvent event) {
 
-        simpleLog.info("onApplicationEvent Call Back");
+
         try {
             startOrderJob();
             startPassengerOrderJob();
@@ -198,7 +196,6 @@ public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebS
 
         Scheduler scheduler = getScheduler("orderJob");
         QuartzManager quartzManager = new QuartzManager(scheduler);
-        simpleLog.info("startOrderJob()");
 
         if (!scheduler.isStarted()) {
             Map<String, Object> map = new HashMap<String, Object>();
@@ -216,7 +213,7 @@ public class SystemWebSocketHandler extends BaseWebSocketHandler implements WebS
 
         Scheduler scheduler = getScheduler("passengerOrderJob");
         QuartzManager quartzManager = new QuartzManager(scheduler);
-        simpleLog.info("startPassengerOrderJob()");
+
 
         if (!scheduler.isStarted()) {
             Map<String, Object> map = new HashMap<String, Object>();

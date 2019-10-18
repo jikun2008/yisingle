@@ -39,14 +39,13 @@ public abstract class BaseWebSocketHandler implements WebSocketHandler {
         String jsonData = returnMessage.getPayload();
         String errorMsg = "";
 
-        simpleLog.info("websocket服务器接收到数据=" + returnMessage.getPayload());
+
 
         try {
             if (JsonUtils.isGoodJson(returnMessage.getPayload())) {
 
                 collatingData(jsonData, wss);
             } else {
-                simpleLog.info("数据不合法");
                 errorMsg = "传递数据不是json格式";
                 sendInvalidData(wss, errorMsg);
             }
